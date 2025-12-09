@@ -1,0 +1,201 @@
+<div class="container-fluid py-4">
+  <div class="row">
+    <!-- Catálogo de Productos -->
+    <div class="col-lg-8">
+      <!-- Header -->
+      <div class="mb-4">
+        <a href="javascript:history.back()" class="btn btn-outline-secondary mb-2">
+          <i class="bi bi-arrow-left"></i> Volver
+        </a>
+        <div class="d-flex align-items-center">
+          {{#if comercio.logoComercio}}
+            <img src="{{comercio.logoComercio}}" alt="{{comercio.nombreComercio}}" style="max-height: 60px; margin-right: 15px;">
+          {{/if}}
+          <div>
+            <h2 class="fw-bold mb-0">{{comercio.nombreComercio}}</h2>
+            <p class="text-muted mb-0">
+              <i class="bi bi-clock"></i> {{comercio.horaApertura}} - {{comercio.horaCierre}}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Productos por Categoría -->
+      {{#if productosPorCategoria}}
+        {{#each productosPorCategoria}}
+          <div class="mb-4">
+            <h4 class="fw-bold border-bottom pb-2">{{@key}}</h4>
+            <div class="row row-cols-1 row-cols-md-2 g-3">
+              {{#each this}}
+                <div class="col">
+                  <div class="card h-100 producto-card" data-id="{{this._id}}" data-nombre="{{this.nombre}}" data-precio="{{this.precio}}">
+                    <div class="row g-0">
+                      <div class="col-4">
+                        {{#if this.imagen}}
+                          <img src="{{this.imagen}}" class="img-fluid rounded-start h-100" style="object-fit: cover;" alt="{{this.nombre}}">
+                        {{else}}
+                          <div class="bg-light h-100 d-flex align-items-center justify-content-center">
+                            <i class="bi bi-image fs-1 text-muted"></i>
+                          </div>
+                        {{/if}}
+                      </div>
+                      <div class="col-8">
+                        <div class="card-body">
+                          <h6 class="card-title fw-bold">{{this.nombre}}</h6>
+                          <p class="card-text text-muted small">{{this.descripcion}}</p>
+                          <div class="d-flex justify-content-between align-items-center">
+                            <span class="fw-bold text-success">{{formatCurrency this.precio}}</span>
+                            <button class="btn btn-sm btn-success agregar-producto">
+                              <i class="bi bi-plus-circle"></i> Agregar
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              {{/each}}
+            </div>
+          </div>
+        {{/each}}
+      {{else}}
+        <div class="alert alert-info text-center">
+          <i class="bi bi-box-seam fs-1 d-block mb-3"></i>
+          <h4>No hay productos disponibles</h4>
+          <p class="mb-0">Este comercio aún no ha agregado productos.</p>
+        </div>
+      {{/if}}
+    </div>
+
+    <!-- Panel de Carrito -->
+    <div class="col-lg-4">
+      <div class="card shadow sticky-top" style="top: 20px;">
+        <div class="card-header bg-success text-white">
+          <h5 class="mb-0"><i class="bi bi-bag"></i> Mi Pedido</h5>
+        </div>
+        <div class="card-body" id="carrito-body">
+          <div id="productos-carrito" class="mb-3">
+            <p class="text-muted text-center py-4">
+              <i class="bi bi-cart-x fs-1 d-block mb-2"></i>
+              No hay productos seleccionados
+            </p>
+          </div>
+
+          <div id="carrito-resumen" style="display: none;">
+            <hr>
+            <div class="d-flex justify-content-between mb-2">
+              <strong>Subtotal:</strong>
+              <strong id="subtotal-carrito">RD$ 0.00</strong>
+            </div>
+          </div>
+        </div>
+        <div class="card-footer">
+          <form action="/cliente/seleccionar-direccion" method="POST" id="form-continuar">
+            <input type="hidden" name="comercioId" value="{{comercio._id}}">
+            <input type="hidden" name="productosIds" id="productosIds-input" value="[]">
+            <button type="submit" class="btn btn-success w-100" id="btn-continuar" disabled>
+              <i class="bi bi-arrow-right-circle"></i> Continuar
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const carrito = [];
+  const productosCarritoDiv = document.getElementById('productos-carrito');
+  const subtotalSpan = document.getElementById('subtotal-carrito');
+  const resumenDiv = document.getElementById('carrito-resumen');
+  const btnContinuar = document.getElementById('btn-continuar');
+  const productosIdsInput = document.getElementById('productosIds-input');
+
+  // Agregar producto al carrito
+  document.querySelectorAll('.agregar-producto').forEach(btn => {
+    btn.addEventListener('click', function() {
+      const card = this.closest('.producto-card');
+      const id = card.dataset.id;
+      const nombre = card.dataset.nombre;
+      const precio = parseFloat(card.dataset.precio);
+
+      // Verificar si ya está en el carrito
+      if (carrito.find(p => p.id === id)) {
+        alert('Este producto ya está en tu pedido');
+        return;
+      }
+
+      // Agregar al carrito
+      carrito.push({ id, nombre, precio });
+      
+      // Deshabilitar botón
+      this.disabled = true;
+      this.innerHTML = '<i class="bi bi-check-circle"></i> Agregado';
+      this.classList.remove('btn-success');
+      this.classList.add('btn-secondary');
+
+      actualizarCarrito();
+    });
+  });
+
+  function actualizarCarrito() {
+    if (carrito.length === 0) {
+      productosCarritoDiv.innerHTML = `
+        <p class="text-muted text-center py-4">
+          <i class="bi bi-cart-x fs-1 d-block mb-2"></i>
+          No hay productos seleccionados
+        </p>
+      `;
+      resumenDiv.style.display = 'none';
+      btnContinuar.disabled = true;
+      return;
+    }
+
+    let html = '';
+    let subtotal = 0;
+
+    carrito.forEach(producto => {
+      subtotal += producto.precio;
+      html += `
+        <div class="d-flex justify-content-between align-items-center mb-2 p-2 border-bottom">
+          <div class="flex-grow-1">
+            <small class="fw-bold">${producto.nombre}</small><br>
+            <small class="text-success">${formatCurrency(producto.precio)}</small>
+          </div>
+          <button class="btn btn-sm btn-outline-danger" onclick="eliminarProducto('${producto.id}')">
+            <i class="bi bi-trash"></i>
+          </button>
+        </div>
+      `;
+    });
+
+    productosCarritoDiv.innerHTML = html;
+    subtotalSpan.textContent = formatCurrency(subtotal);
+    resumenDiv.style.display = 'block';
+    btnContinuar.disabled = false;
+
+    // Actualizar input hidden con IDs
+    productosIdsInput.value = JSON.stringify(carrito.map(p => p.id));
+  }
+
+  function eliminarProducto(id) {
+    const index = carrito.findIndex(p => p.id === id);
+    if (index > -1) {
+      carrito.splice(index, 1);
+      
+      // Re-habilitar botón
+      const card = document.querySelector(`.producto-card[data-id="${id}"]`);
+      const btn = card.querySelector('.agregar-producto');
+      btn.disabled = false;
+      btn.innerHTML = '<i class="bi bi-plus-circle"></i> Agregar';
+      btn.classList.remove('btn-secondary');
+      btn.classList.add('btn-success');
+
+      actualizarCarrito();
+    }
+  }
+
+  function formatCurrency(amount) {
+    return 'RD$ ' + amount.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
+  }
+</script>

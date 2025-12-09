@@ -1,0 +1,91 @@
+<div class="container py-4">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <div class="card shadow">
+        <div class="card-header bg-warning text-dark">
+          <h4 class="mb-0"><i class="bi bi-pencil"></i> Editar Configuración</h4>
+        </div>
+        <div class="card-body p-4">
+          <form action="/admin/configuracion/editar" method="POST">
+            
+            <div class="mb-4">
+              <label for="itbis" class="form-label fw-bold">
+                <i class="bi bi-percent"></i> ITBIS (%) *
+              </label>
+              <input 
+                type="number" 
+                class="form-control form-control-lg" 
+                id="itbis" 
+                name="itbis" 
+                value="{{configuracion.itbis}}"
+                min="0"
+                max="100"
+                step="0.01"
+                required
+                autofocus
+              >
+              <small class="text-muted">Porcentaje de impuesto (0-100). Ejemplo: 18 para 18%</small>
+            </div>
+
+            <!-- Vista previa del cálculo -->
+            <div class="card bg-light mb-4">
+              <div class="card-body">
+                <h6 class="fw-bold mb-3"><i class="bi bi-calculator"></i> Vista Previa del Cálculo:</h6>
+                <div class="d-flex justify-content-between mb-2">
+                  <span>Subtotal ejemplo:</span>
+                  <strong>RD$ 500.00</strong>
+                </div>
+                <div class="d-flex justify-content-between mb-2">
+                  <span>ITBIS (<span id="preview-itbis">{{configuracion.itbis}}</span>%):</span>
+                  <strong>RD$ <span id="preview-valor">{{multiply 500 (divide configuracion.itbis 100)}}</span></strong>
+                </div>
+                <hr>
+                <div class="d-flex justify-content-between">
+                  <strong>Total:</strong>
+                  <strong class="text-success fs-5">RD$ <span id="preview-total">{{add 500 (multiply 500 (divide configuracion.itbis 100))}}</span></strong>
+                </div>
+              </div>
+            </div>
+
+            <div class="alert alert-warning">
+              <i class="bi bi-exclamation-triangle"></i> <strong>Importante:</strong>
+              <p class="mb-0 mt-2 small">
+                Este cambio afectará a <strong>todos los nuevos pedidos</strong> que se realicen a partir de ahora. Los pedidos anteriores mantendrán el ITBIS con el que fueron creados.
+              </p>
+            </div>
+
+            <hr class="my-4">
+
+            <div class="d-grid gap-2">
+              <button type="submit" class="btn btn-warning btn-lg text-dark">
+                <i class="bi bi-check-circle"></i> Guardar Configuración
+              </button>
+              <a href="/admin/configuracion" class="btn btn-outline-secondary">
+                <i class="bi bi-x-circle"></i> Cancelar
+              </a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Vista previa en tiempo real
+  const inputItbis = document.getElementById('itbis');
+  const previewItbis = document.getElementById('preview-itbis');
+  const previewValor = document.getElementById('preview-valor');
+  const previewTotal = document.getElementById('preview-total');
+
+  inputItbis.addEventListener('input', function() {
+    const itbis = parseFloat(this.value) || 0;
+    const subtotal = 500;
+    const valorItbis = (subtotal * itbis) / 100;
+    const total = subtotal + valorItbis;
+
+    previewItbis.textContent = itbis.toFixed(2);
+    previewValor.textContent = valorItbis.toFixed(2);
+    previewTotal.textContent = total.toFixed(2);
+  });
+</script>

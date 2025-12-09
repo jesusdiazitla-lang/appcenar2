@@ -1,0 +1,40 @@
+<div class="container py-4">
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+      <div class="card shadow">
+        <div class="card-body text-center p-5">
+          <i class="bi bi-exclamation-triangle display-1 text-danger d-block mb-4"></i>
+          
+          <h3 class="fw-bold mb-3">¿Eliminar Tipo de Comercio?</h3>
+          
+          <div class="card mb-4">
+            <div class="card-body">
+              {{#if tipoComercio.icono}}
+                <img src="{{tipoComercio.icono}}" alt="{{tipoComercio.nombre}}" class="mb-3" style="max-height: 80px; object-fit: contain;">
+              {{/if}}
+              <h5 class="fw-bold mb-2">{{tipoComercio.nombre}}</h5>
+              <p class="text-muted small mb-2">{{tipoComercio.descripcion}}</p>
+              <span class="badge bg-info">{{cantidadComercios}} {{#if (eq cantidadComercios 1)}}comercio asociado{{else}}comercios asociados{{/if}}</span>
+            </div>
+          </div>
+          
+          <div class="alert alert-danger text-start">
+            <i class="bi bi-exclamation-triangle"></i> <strong>¡ADVERTENCIA IMPORTANTE!</strong>
+            <p class="mb-0 mt-2 small">
+              Al eliminar este tipo de comercio, <strong>TODOS los comercios asociados ({{cantidadComercios}}) también serán eliminados permanentemente</strong>. Esta acción no se puede deshacer.
+            </p>
+          </div>
+
+          <form action="/admin/tipos-comercio/eliminar/{{tipoComercio._id}}" method="POST" class="d-grid gap-2">
+            <button type="submit" class="btn btn-danger btn-lg">
+              <i class="bi bi-trash"></i> Sí, Eliminar Tipo y Comercios
+            </button>
+            <a href="/admin/tipos-comercio" class="btn btn-outline-secondary">
+              <i class="bi bi-x-circle"></i> No, Cancelar
+            </a>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

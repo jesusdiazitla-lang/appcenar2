@@ -1,0 +1,101 @@
+<div class="container-fluid py-4">
+  <div class="mb-4">
+    <h2 class="fw-bold"><i class="bi bi-truck"></i> Gestión de Deliveries</h2>
+    <p class="text-muted">Administra las cuentas de deliveries del sistema</p>
+  </div>
+
+  {{#if deliveries.length}}
+    <div class="card shadow">
+      <div class="card-body">
+        <div class="table-responsive">
+          <table class="table table-hover align-middle">
+            <thead>
+              <tr>
+                <th>Foto</th>
+                <th>Nombre Completo</th>
+                <th>Usuario</th>
+                <th>Correo</th>
+                <th>Teléfono</th>
+                <th class="text-center">Entregas</th>
+                <th class="text-center">Disponibilidad</th>
+                <th class="text-center">Estado</th>
+                <th class="text-center">Acción</th>
+              </tr>
+            </thead>
+            <tbody>
+              {{#each deliveries}}
+                <tr>
+                  <td>
+                    {{#if this.fotoPerfil}}
+                      <img src="{{this.fotoPerfil}}" alt="{{this.nombre}}" class="rounded-circle" style="width: 40px; height: 40px; object-fit: cover;">
+                    {{else}}
+                      <i class="bi bi-person-circle fs-3 text-muted"></i>
+                    {{/if}}
+                  </td>
+                  <td>
+                    <strong>{{this.nombre}} {{this.apellido}}</strong>
+                  </td>
+                  <td>
+                    <small class="text-muted">@{{this.nombreUsuario}}</small>
+                  </td>
+                  <td>
+                    <small>{{this.correo}}</small>
+                  </td>
+                  <td>
+                    <small>{{this.telefono}}</small>
+                  </td>
+                  <td class="text-center">
+                    <span class="badge bg-primary">{{this.cantidadPedidos}}</span>
+                  </td>
+                  <td class="text-center">
+                    {{#if (eq this.estadoDisponibilidad "disponible")}}
+                      <span class="badge bg-success">
+                        <i class="bi bi-check-circle"></i> Disponible
+                      </span>
+                    {{else}}
+                      <span class="badge bg-warning text-dark">
+                        <i class="bi bi-clock"></i> Ocupado
+                      </span>
+                    {{/if}}
+                  </td>
+                  <td class="text-center">
+                    {{#if this.activo}}
+                      <span class="badge bg-success">
+                        <i class="bi bi-check-circle"></i> Activo
+                      </span>
+                    {{else}}
+                      <span class="badge bg-danger">
+                        <i class="bi bi-x-circle"></i> Inactivo
+                      </span>
+                    {{/if}}
+                  </td>
+                  <td class="text-center">
+                    <form action="/admin/deliveries/toggle-activo/{{this._id}}" method="POST" style="display: inline;">
+                      {{#if this.activo}}
+                        <button type="submit" class="btn btn-sm btn-outline-danger" title="Inactivar delivery">
+                          <i class="bi bi-x-circle"></i> Inactivar
+                        </button>
+                      {{else}}
+                        <button type="submit" class="btn btn-sm btn-outline-success" title="Activar delivery">
+                          <i class="bi bi-check-circle"></i> Activar
+                        </button>
+                      {{/if}}
+                    </form>
+                  </td>
+                </tr>
+              {{/each}}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  {{else}}
+    <div class="card shadow">
+      <div class="card-body text-center py-5">
+        <i class="bi bi-truck display-1 text-muted d-block mb-3"></i>
+        <h4>No hay deliveries registrados</h4>
+        <p class="text-muted mb-0">Los deliveries que se registren aparecerán aquí</p>
+      </div>
+    </div>
+  {{/if}}
+</div>

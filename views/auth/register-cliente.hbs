@@ -1,0 +1,158 @@
+<div class="row justify-content-center">
+  <div class="col-md-8 col-lg-6">
+    <div class="card shadow">
+      <div class="card-body p-5">
+        <div class="text-center mb-4">
+          <i class="bi bi-person-plus display-1 text-success"></i>
+          <h2 class="mt-3 fw-bold">Crear Cuenta</h2>
+          <p class="text-muted">Regístrate como Cliente o Delivery</p>
+        </div>
+
+        <form action="/auth/register-cliente" method="POST" enctype="multipart/form-data">
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label for="nombre" class="form-label">
+                <i class="bi bi-person"></i> Nombre *
+              </label>
+              <input 
+                type="text" 
+                class="form-control" 
+                id="nombre" 
+                name="nombre" 
+                required
+              >
+            </div>
+
+            <div class="col-md-6 mb-3">
+              <label for="apellido" class="form-label">
+                <i class="bi bi-person"></i> Apellido *
+              </label>
+              <input 
+                type="text" 
+                class="form-control" 
+                id="apellido" 
+                name="apellido" 
+                required
+              >
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label for="telefono" class="form-label">
+                <i class="bi bi-telephone"></i> Teléfono *
+              </label>
+              <input 
+                type="tel" 
+                class="form-control" 
+                id="telefono" 
+                name="telefono" 
+                placeholder="8091234567"
+                pattern="[0-9]{10}"
+                required
+              >
+              <small class="text-muted">10 dígitos sin guiones</small>
+            </div>
+
+            <div class="col-md-6 mb-3">
+              <label for="correo" class="form-label">
+                <i class="bi bi-envelope"></i> Correo *
+              </label>
+              <input 
+                type="email" 
+                class="form-control" 
+                id="correo" 
+                name="correo" 
+                placeholder="correo@ejemplo.com"
+                required
+              >
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label for="nombreUsuario" class="form-label">
+              <i class="bi bi-at"></i> Nombre de Usuario *
+            </label>
+            <input 
+              type="text" 
+              class="form-control" 
+              id="nombreUsuario" 
+              name="nombreUsuario" 
+              placeholder="usuario123"
+              pattern="[a-zA-Z0-9_]+"
+              required
+            >
+            <small class="text-muted">Solo letras, números y guiones bajos</small>
+          </div>
+
+          <div class="mb-3">
+            <label for="fotoPerfil" class="form-label">
+              <i class="bi bi-image"></i> Foto de Perfil (Opcional)
+            </label>
+            <input 
+              type="file" 
+              class="form-control" 
+              id="fotoPerfil" 
+              name="fotoPerfil"
+              accept="image/*"
+            >
+          </div>
+
+          <div class="mb-3">
+            <label for="rol" class="form-label">
+              <i class="bi bi-person-badge"></i> Registrarme como *
+            </label>
+            <select class="form-select" id="rol" name="rol" required>
+              <option value="">Seleccione una opción</option>
+              <option value="cliente">Cliente</option>
+              <option value="delivery">Delivery</option>
+            </select>
+          </div>
+
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label for="password" class="form-label">
+                <i class="bi bi-lock"></i> Contraseña *
+              </label>
+              <input 
+                type="password" 
+                class="form-control" 
+                id="password" 
+                name="password" 
+                minlength="6"
+                required
+              >
+              <small class="text-muted">Mínimo 6 caracteres</small>
+            </div>
+
+            <div class="col-md-6 mb-3">
+              <label for="confirmarPassword" class="form-label">
+                <i class="bi bi-lock-fill"></i> Confirmar Contraseña *
+              </label>
+              <input 
+                type="password" 
+                class="form-control" 
+                id="confirmarPassword" 
+                name="confirmarPassword" 
+                minlength="6"
+                required
+              >
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-success w-100 py-2 mt-3">
+            <i class="bi bi-person-check"></i> Registrarme
+          </button>
+        </form>
+
+        <hr class="my-4">
+
+        <div class="text-center">
+          <p class="mb-0">¿Ya tienes cuenta? 
+            <a href="/auth/login" class="text-decoration-none fw-bold">Inicia Sesión</a>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

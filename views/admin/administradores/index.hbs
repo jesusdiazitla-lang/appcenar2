@@ -1,0 +1,99 @@
+<div class="container-fluid py-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h2 class="fw-bold"><i class="bi bi-shield-check"></i> Administradores</h2>
+      <p class="text-muted mb-0">Gestiona las cuentas de administradores del sistema</p>
+    </div>
+    <a href="/admin/administradores/crear" class="btn btn-dark">
+      <i class="bi bi-plus-circle"></i> Nuevo Administrador
+    </a>
+  </div>
+
+  {{#if administradores.length}}
+    <div class="card shadow">
+      <div class="card-body">
+        <div class="table-responsive">
+          <table class="table table-hover align-middle">
+            <thead>
+              <tr>
+                <th>Nombre Completo</th>
+                <th>Cédula</th>
+                <th>Usuario</th>
+                <th>Correo</th>
+                <th class="text-center">Estado</th>
+                <th class="text-center">Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              {{#each administradores}}
+                <tr {{#if (eq this._id ../usuarioLogueadoId)}}class="table-primary"{{/if}}>
+                  <td>
+                    <strong>{{this.nombre}} {{this.apellido}}</strong>
+                    {{#if (eq this._id ../usuarioLogueadoId)}}
+                      <span class="badge bg-primary ms-2">Tú</span>
+                    {{/if}}
+                  </td>
+                  <td>
+                    <small>{{this.cedula}}</small>
+                  </td>
+                  <td>
+                    <small class="text-muted">@{{this.nombreUsuario}}</small>
+                  </td>
+                  <td>
+                    <small>{{this.correo}}</small>
+                  </td>
+                  <td class="text-center">
+                    {{#if this.activo}}
+                      <span class="badge bg-success">
+                        <i class="bi bi-check-circle"></i> Activo
+                      </span>
+                    {{else}}
+                      <span class="badge bg-danger">
+                        <i class="bi bi-x-circle"></i> Inactivo
+                      </span>
+                    {{/if}}
+                  </td>
+                  <td class="text-center">
+                    {{#if (eq this._id ../usuarioLogueadoId)}}
+                      <span class="text-muted small">
+                        <i class="bi bi-lock"></i> No puedes modificar tu usuario
+                      </span>
+                    {{else}}
+                      <div class="btn-group btn-group-sm" role="group">
+                        <a href="/admin/administradores/editar/{{this._id}}" class="btn btn-outline-primary" title="Editar">
+                          <i class="bi bi-pencil"></i>
+                        </a>
+                        <form action="/admin/administradores/toggle-activo/{{this._id}}" method="POST" style="display: inline;">
+                          {{#if this.activo}}
+                            <button type="submit" class="btn btn-outline-danger" title="Inactivar">
+                              <i class="bi bi-x-circle"></i>
+                            </button>
+                          {{else}}
+                            <button type="submit" class="btn btn-outline-success" title="Activar">
+                              <i class="bi bi-check-circle"></i>
+                            </button>
+                          {{/if}}
+                        </form>
+                      </div>
+                    {{/if}}
+                  </td>
+                </tr>
+              {{/each}}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  {{else}}
+    <div class="card shadow">
+      <div class="card-body text-center py-5">
+        <i class="bi bi-shield-check display-1 text-muted d-block mb-3"></i>
+        <h4>No hay otros administradores</h4>
+        <p class="text-muted mb-4">Crea cuentas de administrador para tu equipo</p>
+        <a href="/admin/administradores/crear" class="btn btn-dark">
+          <i class="bi bi-plus-circle"></i> Crear Administrador
+        </a>
+      </div>
+    </div>
+  {{/if}}
+</div>

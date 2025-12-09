@@ -1,0 +1,38 @@
+<div class="container py-4">
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+      <div class="card shadow">
+        <div class="card-body text-center p-5">
+          <i class="bi bi-exclamation-triangle display-1 text-danger d-block mb-4"></i>
+          
+          <h3 class="fw-bold mb-3">¿Eliminar Producto?</h3>
+          
+          <div class="card mb-4">
+            <div class="card-body">
+              {{#if producto.imagen}}
+                <img src="{{producto.imagen}}" alt="{{producto.nombre}}" class="img-fluid rounded mb-3" style="max-height: 150px; object-fit: contain;">
+              {{/if}}
+              <h5 class="fw-bold mb-2">{{producto.nombre}}</h5>
+              <p class="text-muted small mb-2">{{producto.descripcion}}</p>
+              <span class="badge bg-info">{{#if producto.categoria}}{{producto.categoria.nombre}}{{else}}Sin categoría{{/if}}</span>
+              <p class="fw-bold text-success mt-2 mb-0">{{formatCurrency producto.precio}}</p>
+            </div>
+          </div>
+          
+          <p class="text-muted mb-4">
+            Este producto será eliminado permanentemente de tu catálogo. Esta acción no se puede deshacer.
+          </p>
+
+          <form action="/comercio/productos/eliminar/{{producto._id}}" method="POST" class="d-grid gap-2">
+            <button type="submit" class="btn btn-danger btn-lg">
+              <i class="bi bi-trash"></i> Sí, Eliminar Producto
+            </button>
+            <a href="/comercio/productos" class="btn btn-outline-secondary">
+              <i class="bi bi-x-circle"></i> No, Cancelar
+            </a>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

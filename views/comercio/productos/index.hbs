@@ -1,0 +1,84 @@
+<div class="container-fluid py-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h2 class="fw-bold"><i class="bi bi-box-seam"></i> Mis Productos</h2>
+      <p class="text-muted mb-0">Gestiona el catálogo de tu comercio</p>
+    </div>
+    <a href="/comercio/productos/crear" class="btn btn-primary">
+      <i class="bi bi-plus-circle"></i> Nuevo Producto
+    </a>
+  </div>
+
+  {{#if productos.length}}
+    <div class="card shadow">
+      <div class="card-body">
+        <div class="table-responsive">
+          <table class="table table-hover align-middle">
+            <thead>
+              <tr>
+                <th>Imagen</th>
+                <th>Nombre</th>
+                <th>Descripción</th>
+                <th>Categoría</th>
+                <th>Precio</th>
+                <th class="text-center">Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              {{#each productos}}
+                <tr>
+                  <td>
+                    {{#if this.imagen}}
+                      <img src="{{this.imagen}}" alt="{{this.nombre}}" class="rounded" style="width: 60px; height: 60px; object-fit: cover;">
+                    {{else}}
+                      <div class="bg-light rounded d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
+                        <i class="bi bi-image text-muted"></i>
+                      </div>
+                    {{/if}}
+                  </td>
+                  <td>
+                    <strong>{{this.nombre}}</strong>
+                  </td>
+                  <td>
+                    <small class="text-muted">{{this.descripcion}}</small>
+                  </td>
+                  <td>
+                    {{#if this.categoria}}
+                      <span class="badge bg-info">{{this.categoria.nombre}}</span>
+                    {{else}}
+                      <span class="badge bg-secondary">Sin categoría</span>
+                    {{/if}}
+                  </td>
+                  <td>
+                    <strong class="text-success">{{formatCurrency this.precio}}</strong>
+                  </td>
+                  <td class="text-center">
+                    <div class="btn-group btn-group-sm" role="group">
+                      <a href="/comercio/productos/editar/{{this._id}}" class="btn btn-outline-primary" title="Editar">
+                        <i class="bi bi-pencil"></i>
+                      </a>
+                      <a href="/comercio/productos/eliminar/{{this._id}}" class="btn btn-outline-danger" title="Eliminar">
+                        <i class="bi bi-trash"></i>
+                      </a>
+                    </div>
+                  </td>
+                </tr>
+              {{/each}}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  {{else}}
+    <div class="card shadow">
+      <div class="card-body text-center py-5">
+        <i class="bi bi-box-seam display-1 text-muted d-block mb-3"></i>
+        <h4>No tienes productos registrados</h4>
+        <p class="text-muted mb-4">Comienza agregando productos a tu catálogo</p>
+        <a href="/comercio/productos/crear" class="btn btn-primary">
+          <i class="bi bi-plus-circle"></i> Crear Primer Producto
+        </a>
+      </div>
+    </div>
+  {{/if}}
+</div>

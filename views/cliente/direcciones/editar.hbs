@@ -1,0 +1,54 @@
+<div class="container py-4">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <div class="card shadow">
+        <div class="card-header bg-primary text-white">
+          <h4 class="mb-0"><i class="bi bi-pencil"></i> Editar Dirección</h4>
+        </div>
+        <div class="card-body p-4">
+          <form action="/cliente/direcciones/editar/{{direccion._id}}" method="POST">
+            <div class="mb-3">
+              <label for="nombre" class="form-label fw-bold">
+                <i class="bi bi-tag"></i> Nombre de la Dirección *
+              </label>
+              <input 
+                type="text" 
+                class="form-control" 
+                id="nombre" 
+                name="nombre" 
+                value="{{direccion.nombre}}"
+                required
+              >
+              <small class="text-muted">Un nombre para identificar esta dirección</small>
+            </div>
+
+            <div class="mb-3">
+              <label for="descripcion" class="form-label fw-bold">
+                <i class="bi bi-geo-alt"></i> Dirección Completa *
+              </label>
+              <textarea 
+                class="form-control" 
+                id="descripcion" 
+                name="descripcion" 
+                rows="4" 
+                required
+              >{{direccion.descripcion}}</textarea>
+              <small class="text-muted">Incluye calle, número, sector, referencias, etc.</small>
+            </div>
+
+            <hr class="my-4">
+
+            <div class="d-grid gap-2">
+              <button type="submit" class="btn btn-primary btn-lg">
+                <i class="bi bi-check-circle"></i> Guardar Cambios
+              </button>
+              <a href="/cliente/direcciones" class="btn btn-outline-secondary">
+                <i class="bi bi-x-circle"></i> Cancelar
+              </a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

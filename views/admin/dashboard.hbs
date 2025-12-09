@@ -1,0 +1,159 @@
+<div class="container-fluid py-4">
+  <div class="mb-4">
+    <h2 class="fw-bold"><i class="bi bi-speedometer2"></i> Dashboard</h2>
+    <p class="text-muted">Resumen general del sistema AppCenar</p>
+  </div>
+
+  <!-- Estadísticas de Pedidos -->
+  <div class="row g-4 mb-4">
+    <div class="col-md-6">
+      <div class="card shadow stat-card primary h-100">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <h6 class="text-muted mb-2">Total de Pedidos</h6>
+              <h2 class="fw-bold mb-0">{{estadisticas.totalPedidos}}</h2>
+              <small class="text-muted">Desde el inicio</small>
+            </div>
+            <i class="bi bi-bag-check stat-icon text-primary"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-6">
+      <div class="card shadow stat-card success h-100">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <h6 class="text-muted mb-2">Pedidos de Hoy</h6>
+              <h2 class="fw-bold mb-0 text-success">{{estadisticas.pedidosHoy}}</h2>
+              <small class="text-muted">{{formatDate now}}</small>
+            </div>
+            <i class="bi bi-calendar-check stat-icon text-success"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Estadísticas de Comercios -->
+  <h5 class="fw-bold mb-3"><i class="bi bi-shop"></i> Comercios</h5>
+  <div class="row g-4 mb-4">
+    <div class="col-md-6">
+      <div class="card shadow stat-card success h-100">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <h6 class="text-muted mb-2">Comercios Activos</h6>
+              <h2 class="fw-bold mb-0 text-success">{{estadisticas.comerciosActivos}}</h2>
+              <small class="text-muted">Disponibles para clientes</small>
+            </div>
+            <i class="bi bi-shop-window stat-icon text-success"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-6">
+      <div class="card shadow stat-card warning h-100">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <h6 class="text-muted mb-2">Comercios Inactivos</h6>
+              <h2 class="fw-bold mb-0 text-warning">{{estadisticas.comerciosInactivos}}</h2>
+              <small class="text-muted">Pendientes de activación</small>
+            </div>
+            <i class="bi bi-shop-window stat-icon text-warning"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Estadísticas de Clientes -->
+  <h5 class="fw-bold mb-3"><i class="bi bi-people"></i> Clientes</h5>
+  <div class="row g-4 mb-4">
+    <div class="col-md-6">
+      <div class="card shadow stat-card success h-100">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <h6 class="text-muted mb-2">Clientes Activos</h6>
+              <h2 class="fw-bold mb-0 text-success">{{estadisticas.clientesActivos}}</h2>
+              <small class="text-muted">Pueden realizar pedidos</small>
+            </div>
+            <i class="bi bi-person-check stat-icon text-success"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-6">
+      <div class="card shadow stat-card warning h-100">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <h6 class="text-muted mb-2">Clientes Inactivos</h6>
+              <h2 class="fw-bold mb-0 text-warning">{{estadisticas.clientesInactivos}}</h2>
+              <small class="text-muted">Cuentas suspendidas</small>
+            </div>
+            <i class="bi bi-person-x stat-icon text-warning"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Estadísticas de Deliveries -->
+  <h5 class="fw-bold mb-3"><i class="bi bi-truck"></i> Deliveries</h5>
+  <div class="row g-4 mb-4">
+    <div class="col-md-6">
+      <div class="card shadow stat-card success h-100">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <h6 class="text-muted mb-2">Deliveries Activos</h6>
+              <h2 class="fw-bold mb-0 text-success">{{estadisticas.deliveriesActivos}}</h2>
+              <small class="text-muted">Disponibles para entregas</small>
+            </div>
+            <i class="bi bi-truck stat-icon text-success"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-6">
+      <div class="card shadow stat-card warning h-100">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <h6 class="text-muted mb-2">Deliveries Inactivos</h6>
+              <h2 class="fw-bold mb-0 text-warning">{{estadisticas.deliveriesInactivos}}</h2>
+              <small class="text-muted">Cuentas suspendidas</small>
+            </div>
+            <i class="bi bi-truck stat-icon text-warning"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Estadística de Productos -->
+  <div class="row g-4">
+    <div class="col-md-12">
+      <div class="card shadow stat-card info h-100">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <h6 class="text-muted mb-2">Total de Productos</h6>
+              <h2 class="fw-bold mb-0 text-info">{{estadisticas.totalProductos}}</h2>
+              <small class="text-muted">Registrados en el sistema</small>
+            </div>
+            <i class="bi bi-box-seam stat-icon text-info"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,77 @@
+<div class="container py-4">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <div class="card shadow">
+        <div class="card-header bg-dark text-white">
+          <h4 class="mb-0"><i class="bi bi-plus-circle"></i> Nuevo Tipo de Comercio</h4>
+        </div>
+        <div class="card-body p-4">
+          <form action="/admin/tipos-comercio/crear" method="POST" enctype="multipart/form-data">
+            
+            <div class="mb-3">
+              <label for="nombre" class="form-label fw-bold">
+                <i class="bi bi-tag"></i> Nombre del Tipo *
+              </label>
+              <input 
+                type="text" 
+                class="form-control" 
+                id="nombre" 
+                name="nombre" 
+                placeholder="Ej: Restaurante, Farmacia, Supermercado"
+                required
+                autofocus
+              >
+              <small class="text-muted">Un nombre descriptivo para este tipo de comercio</small>
+            </div>
+
+            <div class="mb-3">
+              <label for="descripcion" class="form-label fw-bold">
+                <i class="bi bi-text-paragraph"></i> Descripción *
+              </label>
+              <textarea 
+                class="form-control" 
+                id="descripcion" 
+                name="descripcion" 
+                rows="4" 
+                placeholder="Describe qué tipo de comercios incluye esta categoría..."
+                required
+              ></textarea>
+              <small class="text-muted">Ayuda a los comercios a identificar su tipo</small>
+            </div>
+
+            <div class="mb-3">
+              <label for="icono" class="form-label fw-bold">
+                <i class="bi bi-image"></i> Icono del Tipo *
+              </label>
+              <input 
+                type="file" 
+                class="form-control" 
+                id="icono" 
+                name="icono"
+                accept="image/*"
+                required
+              >
+              <small class="text-muted">Un icono representativo para este tipo (PNG, JPG, SVG)</small>
+            </div>
+
+            <div class="alert alert-info">
+              <i class="bi bi-info-circle"></i> <strong>Nota:</strong> 
+              Este tipo aparecerá en el registro de comercios y en el home de clientes.
+            </div>
+
+            <hr class="my-4">
+
+            <div class="d-grid gap-2">
+              <button type="submit" class="btn btn-dark btn-lg">
+                <i class="bi bi-check-circle"></i> Crear Tipo de Comercio
+              </button>
+              <a href="/admin/tipos-comercio" class="btn btn-outline-secondary">
+                <i class="bi bi-x-circle"></i> Cancelar
+              </a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

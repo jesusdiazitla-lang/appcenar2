@@ -1,0 +1,123 @@
+<div class="container py-4">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <div class="card shadow">
+        <div class="card-header bg-success text-white">
+          <h4 class="mb-0"><i class="bi bi-person-circle"></i> Mi Perfil</h4>
+        </div>
+        <div class="card-body p-4">
+          <form action="/cliente/perfil" method="POST" enctype="multipart/form-data">
+            <!-- Foto de Perfil -->
+            <div class="text-center mb-4">
+              {{#if cliente.fotoPerfil}}
+                <img src="{{cliente.fotoPerfil}}" alt="Foto de perfil" class="rounded-circle mb-3" style="width: 150px; height: 150px; object-fit: cover;">
+              {{else}}
+                <i class="bi bi-person-circle display-1 text-muted d-block mb-3"></i>
+              {{/if}}
+              <div>
+                <label for="fotoPerfil" class="btn btn-outline-success btn-sm">
+                  <i class="bi bi-camera"></i> Cambiar Foto
+                </label>
+                <input 
+                  type="file" 
+                  class="d-none" 
+                  id="fotoPerfil" 
+                  name="fotoPerfil"
+                  accept="image/*"
+                >
+              </div>
+            </div>
+
+            <!-- Información Personal -->
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label for="nombre" class="form-label fw-bold">
+                  <i class="bi bi-person"></i> Nombre *
+                </label>
+                <input 
+                  type="text" 
+                  class="form-control" 
+                  id="nombre" 
+                  name="nombre" 
+                  value="{{cliente.nombre}}"
+                  required
+                >
+              </div>
+
+              <div class="col-md-6 mb-3">
+                <label for="apellido" class="form-label fw-bold">
+                  <i class="bi bi-person"></i> Apellido *
+                </label>
+                <input 
+                  type="text" 
+                  class="form-control" 
+                  id="apellido" 
+                  name="apellido" 
+                  value="{{cliente.apellido}}"
+                  required
+                >
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label for="telefono" class="form-label fw-bold">
+                <i class="bi bi-telephone"></i> Teléfono *
+              </label>
+              <input 
+                type="tel" 
+                class="form-control" 
+                id="telefono" 
+                name="telefono" 
+                value="{{cliente.telefono}}"
+                pattern="[0-9]{10}"
+                required
+              >
+              <small class="text-muted">10 dígitos sin guiones</small>
+            </div>
+
+            <!-- Información de Cuenta (Solo lectura) -->
+            <hr class="my-4">
+            <h5 class="mb-3">Información de Cuenta</h5>
+
+            <div class="mb-3">
+              <label class="form-label fw-bold">
+                <i class="bi bi-envelope"></i> Correo
+              </label>
+              <input 
+                type="email" 
+                class="form-control" 
+                value="{{cliente.correo}}"
+                disabled
+              >
+              <small class="text-muted">No se puede modificar el correo</small>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label fw-bold">
+                <i class="bi bi-at"></i> Nombre de Usuario
+              </label>
+              <input 
+                type="text" 
+                class="form-control" 
+                value="{{cliente.nombreUsuario}}"
+                disabled
+              >
+              <small class="text-muted">No se puede modificar el usuario</small>
+            </div>
+
+            <!-- Botones -->
+            <hr class="my-4">
+            <div class="d-grid gap-2">
+              <button type="submit" class="btn btn-success btn-lg">
+                <i class="bi bi-check-circle"></i> Guardar Cambios
+              </button>
+              <a href="/cliente/home" class="btn btn-outline-secondary">
+                <i class="bi bi-x-circle"></i> Cancelar
+              </a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

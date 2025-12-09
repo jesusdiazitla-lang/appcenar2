@@ -1,0 +1,112 @@
+<div class="container py-4">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <div class="card shadow">
+        <div class="card-header bg-warning text-dark">
+          <h4 class="mb-0"><i class="bi bi-pencil"></i> Editar Producto</h4>
+        </div>
+        <div class="card-body p-4">
+          <form action="/comercio/productos/editar/{{producto._id}}" method="POST" enctype="multipart/form-data">
+            
+            <div class="mb-3">
+              <label for="nombre" class="form-label fw-bold">
+                <i class="bi bi-box"></i> Nombre del Producto *
+              </label>
+              <input 
+                type="text" 
+                class="form-control" 
+                id="nombre" 
+                name="nombre" 
+                value="{{producto.nombre}}"
+                required
+                autofocus
+              >
+            </div>
+
+            <div class="mb-3">
+              <label for="descripcion" class="form-label fw-bold">
+                <i class="bi bi-text-paragraph"></i> Descripción *
+              </label>
+              <textarea 
+                class="form-control" 
+                id="descripcion" 
+                name="descripcion" 
+                rows="3" 
+                required
+              >{{producto.descripcion}}</textarea>
+            </div>
+
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label for="precio" class="form-label fw-bold">
+                  <i class="bi bi-currency-dollar"></i> Precio (RD$) *
+                </label>
+                <input 
+                  type="number" 
+                  class="form-control" 
+                  id="precio" 
+                  name="precio" 
+                  value="{{producto.precio}}"
+                  step="0.01"
+                  min="0"
+                  required
+                >
+              </div>
+
+              <div class="col-md-6 mb-3">
+                <label for="categoria" class="form-label fw-bold">
+                  <i class="bi bi-tag"></i> Categoría *
+                </label>
+                <select class="form-select" id="categoria" name="categoria" required>
+                  <option value="">Seleccione una categoría</option>
+                  {{#each categorias}}
+                    <option value="{{this._id}}" {{#if (eq this._id ../producto.categoria._id)}}selected{{/if}}>
+                      {{this.nombre}}
+                    </option>
+                  {{/each}}
+                </select>
+              </div>
+            </div>
+
+            <!-- Imagen Actual -->
+            {{#if producto.imagen}}
+              <div class="mb-3">
+                <label class="form-label fw-bold">
+                  <i class="bi bi-image"></i> Imagen Actual
+                </label>
+                <div class="text-center mb-2">
+                  <img src="{{producto.imagen}}" alt="{{producto.nombre}}" class="img-fluid rounded" style="max-height: 200px; object-fit: contain;">
+                </div>
+              </div>
+            {{/if}}
+
+            <div class="mb-3">
+              <label for="imagen" class="form-label fw-bold">
+                <i class="bi bi-image"></i> Cambiar Imagen (Opcional)
+              </label>
+              <input 
+                type="file" 
+                class="form-control" 
+                id="imagen" 
+                name="imagen"
+                accept="image/*"
+              >
+              <small class="text-muted">Deja en blanco si no quieres cambiar la imagen</small>
+            </div>
+
+            <hr class="my-4">
+
+            <div class="d-grid gap-2">
+              <button type="submit" class="btn btn-warning btn-lg text-dark">
+                <i class="bi bi-check-circle"></i> Guardar Cambios
+              </button>
+              <a href="/comercio/productos" class="btn btn-outline-secondary">
+                <i class="bi bi-x-circle"></i> Cancelar
+              </a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

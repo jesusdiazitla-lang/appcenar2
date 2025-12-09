@@ -1,0 +1,146 @@
+<div class="container py-4">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <div class="card shadow">
+        <div class="card-header bg-dark text-white">
+          <h4 class="mb-0"><i class="bi bi-plus-circle"></i> Nuevo Administrador</h4>
+        </div>
+        <div class="card-body p-4">
+          <form action="/admin/administradores/crear" method="POST">
+            
+            <!-- Información Personal -->
+            <h5 class="mb-3 border-bottom pb-2">Información Personal</h5>
+
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label for="nombre" class="form-label fw-bold">
+                  <i class="bi bi-person"></i> Nombre *
+                </label>
+                <input 
+                  type="text" 
+                  class="form-control" 
+                  id="nombre" 
+                  name="nombre" 
+                  required
+                  autofocus
+                >
+              </div>
+
+              <div class="col-md-6 mb-3">
+                <label for="apellido" class="form-label fw-bold">
+                  <i class="bi bi-person"></i> Apellido *
+                </label>
+                <input 
+                  type="text" 
+                  class="form-control" 
+                  id="apellido" 
+                  name="apellido" 
+                  required
+                >
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label for="cedula" class="form-label fw-bold">
+                <i class="bi bi-card-text"></i> Cédula *
+              </label>
+              <input 
+                type="text" 
+                class="form-control" 
+                id="cedula" 
+                name="cedula" 
+                placeholder="00000000000"
+                pattern="[0-9]{11}"
+                required
+              >
+              <small class="text-muted">11 dígitos sin guiones</small>
+            </div>
+
+            <!-- Información de Cuenta -->
+            <h5 class="mb-3 border-bottom pb-2 mt-4">Información de Cuenta</h5>
+
+            <div class="mb-3">
+              <label for="correo" class="form-label fw-bold">
+                <i class="bi bi-envelope"></i> Correo Electrónico *
+              </label>
+              <input 
+                type="email" 
+                class="form-control" 
+                id="correo" 
+                name="correo" 
+                placeholder="admin@appcenar.com"
+                required
+              >
+            </div>
+
+            <div class="mb-3">
+              <label for="nombreUsuario" class="form-label fw-bold">
+                <i class="bi bi-at"></i> Nombre de Usuario *
+              </label>
+              <input 
+                type="text" 
+                class="form-control" 
+                id="nombreUsuario" 
+                name="nombreUsuario" 
+                placeholder="usuario123"
+                pattern="[a-zA-Z0-9_]+"
+                required
+              >
+              <small class="text-muted">Solo letras, números y guiones bajos</small>
+            </div>
+
+            <!-- Contraseña -->
+            <h5 class="mb-3 border-bottom pb-2 mt-4">Contraseña</h5>
+
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label for="password" class="form-label fw-bold">
+                  <i class="bi bi-lock"></i> Contraseña *
+                </label>
+                <input 
+                  type="password" 
+                  class="form-control" 
+                  id="password" 
+                  name="password" 
+                  minlength="6"
+                  required
+                >
+                <small class="text-muted">Mínimo 6 caracteres</small>
+              </div>
+
+              <div class="col-md-6 mb-3">
+                <label for="confirmarPassword" class="form-label fw-bold">
+                  <i class="bi bi-lock-fill"></i> Confirmar Contraseña *
+                </label>
+                <input 
+                  type="password" 
+                  class="form-control" 
+                  id="confirmarPassword" 
+                  name="confirmarPassword" 
+                  minlength="6"
+                  required
+                >
+              </div>
+            </div>
+
+            <div class="alert alert-info">
+              <i class="bi bi-info-circle"></i> <strong>Nota:</strong>
+              El nuevo administrador tendrá acceso completo al sistema y podrá gestionar todos los módulos.
+            </div>
+
+            <hr class="my-4">
+
+            <div class="d-grid gap-2">
+              <button type="submit" class="btn btn-dark btn-lg">
+                <i class="bi bi-check-circle"></i> Crear Administrador
+              </button>
+              <a href="/admin/administradores" class="btn btn-outline-secondary">
+                <i class="bi bi-x-circle"></i> Cancelar
+              </a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

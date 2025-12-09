@@ -1,0 +1,107 @@
+<div class="container py-4">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <div class="card shadow">
+        <div class="card-header bg-primary text-white">
+          <h4 class="mb-0"><i class="bi bi-plus-circle"></i> Nuevo Producto</h4>
+        </div>
+        <div class="card-body p-4">
+          <form action="/comercio/productos/crear" method="POST" enctype="multipart/form-data">
+            
+            <div class="mb-3">
+              <label for="nombre" class="form-label fw-bold">
+                <i class="bi bi-box"></i> Nombre del Producto *
+              </label>
+              <input 
+                type="text" 
+                class="form-control" 
+                id="nombre" 
+                name="nombre" 
+                placeholder="Ej: Hamburguesa Especial"
+                required
+                autofocus
+              >
+            </div>
+
+            <div class="mb-3">
+              <label for="descripcion" class="form-label fw-bold">
+                <i class="bi bi-text-paragraph"></i> Descripción *
+              </label>
+              <textarea 
+                class="form-control" 
+                id="descripcion" 
+                name="descripcion" 
+                rows="3" 
+                placeholder="Describe los ingredientes, características especiales, etc."
+                required
+              ></textarea>
+            </div>
+
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label for="precio" class="form-label fw-bold">
+                  <i class="bi bi-currency-dollar"></i> Precio (RD$) *
+                </label>
+                <input 
+                  type="number" 
+                  class="form-control" 
+                  id="precio" 
+                  name="precio" 
+                  placeholder="0.00"
+                  step="0.01"
+                  min="0"
+                  required
+                >
+              </div>
+
+              <div class="col-md-6 mb-3">
+                <label for="categoria" class="form-label fw-bold">
+                  <i class="bi bi-tag"></i> Categoría *
+                </label>
+                <select class="form-select" id="categoria" name="categoria" required>
+                  <option value="">Seleccione una categoría</option>
+                  {{#each categorias}}
+                    <option value="{{this._id}}">{{this.nombre}}</option>
+                  {{/each}}
+                </select>
+                {{#unless categorias.length}}
+                  <small class="text-danger">
+                    <i class="bi bi-exclamation-circle"></i> 
+                    Debes crear al menos una categoría. 
+                    <a href="/comercio/categorias/crear" target="_blank">Crear ahora</a>
+                  </small>
+                {{/unless}}
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label for="imagen" class="form-label fw-bold">
+                <i class="bi bi-image"></i> Imagen del Producto *
+              </label>
+              <input 
+                type="file" 
+                class="form-control" 
+                id="imagen" 
+                name="imagen"
+                accept="image/*"
+                required
+              >
+              <small class="text-muted">Formatos: JPG, PNG, WEBP. Tamaño máximo: 5MB</small>
+            </div>
+
+            <hr class="my-4">
+
+            <div class="d-grid gap-2">
+              <button type="submit" class="btn btn-primary btn-lg" {{#unless categorias.length}}disabled{{/unless}}>
+                <i class="bi bi-check-circle"></i> Crear Producto
+              </button>
+              <a href="/comercio/productos" class="btn btn-outline-secondary">
+                <i class="bi bi-x-circle"></i> Cancelar
+              </a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

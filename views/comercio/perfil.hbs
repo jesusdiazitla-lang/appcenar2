@@ -1,0 +1,153 @@
+<div class="container py-4">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <div class="card shadow">
+        <div class="card-header bg-primary text-white">
+          <h4 class="mb-0"><i class="bi bi-shop-window"></i> Perfil del Comercio</h4>
+        </div>
+        <div class="card-body p-4">
+          <form action="/comercio/perfil" method="POST" enctype="multipart/form-data">
+            <!-- Logo del Comercio -->
+            <div class="text-center mb-4">
+              {{#if comercio.logoComercio}}
+                <img src="{{comercio.logoComercio}}" alt="Logo del comercio" class="mb-3" style="max-height: 150px; object-fit: contain;">
+              {{else}}
+                <i class="bi bi-shop-window display-1 text-muted d-block mb-3"></i>
+              {{/if}}
+              <div>
+                <label for="logoComercio" class="btn btn-outline-primary btn-sm">
+                  <i class="bi bi-image"></i> Cambiar Logo
+                </label>
+                <input 
+                  type="file" 
+                  class="d-none" 
+                  id="logoComercio" 
+                  name="logoComercio"
+                  accept="image/*"
+                >
+              </div>
+            </div>
+
+            <!-- Información del Comercio -->
+            <h5 class="mb-3 border-bottom pb-2">Información del Comercio</h5>
+
+            <div class="mb-3">
+              <label class="form-label fw-bold">
+                <i class="bi bi-shop"></i> Nombre del Comercio
+              </label>
+              <input 
+                type="text" 
+                class="form-control" 
+                value="{{comercio.nombreComercio}}"
+                disabled
+              >
+              <small class="text-muted">No se puede modificar el nombre del comercio</small>
+            </div>
+
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label for="telefono" class="form-label fw-bold">
+                  <i class="bi bi-telephone"></i> Teléfono *
+                </label>
+                <input 
+                  type="tel" 
+                  class="form-control" 
+                  id="telefono" 
+                  name="telefono" 
+                  value="{{comercio.telefono}}"
+                  pattern="[0-9]{10}"
+                  required
+                >
+                <small class="text-muted">10 dígitos sin guiones</small>
+              </div>
+
+              <div class="col-md-6 mb-3">
+                <label for="correo" class="form-label fw-bold">
+                  <i class="bi bi-envelope"></i> Correo *
+                </label>
+                <input 
+                  type="email" 
+                  class="form-control" 
+                  id="correo" 
+                  name="correo" 
+                  value="{{comercio.correo}}"
+                  required
+                >
+              </div>
+            </div>
+
+            <!-- Horarios -->
+            <h5 class="mb-3 border-bottom pb-2 mt-4">Horario de Atención</h5>
+
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label for="horaApertura" class="form-label fw-bold">
+                  <i class="bi bi-clock"></i> Hora de Apertura *
+                </label>
+                <input 
+                  type="time" 
+                  class="form-control" 
+                  id="horaApertura" 
+                  name="horaApertura" 
+                  value="{{comercio.horaApertura}}"
+                  required
+                >
+              </div>
+
+              <div class="col-md-6 mb-3">
+                <label for="horaCierre" class="form-label fw-bold">
+                  <i class="bi bi-clock-fill"></i> Hora de Cierre *
+                </label>
+                <input 
+                  type="time" 
+                  class="form-control" 
+                  id="horaCierre" 
+                  name="horaCierre" 
+                  value="{{comercio.horaCierre}}"
+                  required
+                >
+              </div>
+            </div>
+
+            <!-- Tipo de Comercio (Solo lectura) -->
+            <div class="mb-3">
+              <label class="form-label fw-bold">
+                <i class="bi bi-tag"></i> Tipo de Comercio
+              </label>
+              <input 
+                type="text" 
+                class="form-control" 
+                value="{{#if comercio.tipoComercio}}{{comercio.tipoComercio.nombre}}{{else}}No especificado{{/if}}"
+                disabled
+              >
+              <small class="text-muted">No se puede modificar el tipo de comercio</small>
+            </div>
+
+            <!-- Estado de la Cuenta -->
+            <div class="alert {{#if comercio.activo}}alert-success{{else}}alert-warning{{/if}}">
+              <i class="bi bi-info-circle"></i> <strong>Estado de la Cuenta:</strong> 
+              {{#if comercio.activo}}
+                <span class="badge bg-success">Activa</span>
+                <p class="mb-0 mt-2 small">Tu comercio está visible para los clientes</p>
+              {{else}}
+                <span class="badge bg-warning text-dark">Inactiva</span>
+                <p class="mb-0 mt-2 small">Contacta con un administrador para activar tu comercio</p>
+              {{/if}}
+            </div>
+
+            <!-- Botones -->
+            <hr class="my-4">
+            <div class="d-grid gap-2">
+              <button type="submit" class="btn btn-primary btn-lg">
+                <i class="bi bi-check-circle"></i> Guardar Cambios
+              </button>
+              <a href="/comercio/home" class="btn btn-outline-secondary">
+                <i class="bi bi-x-circle"></i> Cancelar
+              </a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

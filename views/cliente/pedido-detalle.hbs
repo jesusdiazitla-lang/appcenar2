@@ -1,0 +1,105 @@
+<div class="container py-4">
+  <div class="mb-4">
+    <a href="/cliente/pedidos" class="btn btn-outline-secondary mb-2">
+      <i class="bi bi-arrow-left"></i> Volver a Mis Pedidos
+    </a>
+    <h2 class="fw-bold"><i class="bi bi-receipt"></i> Detalle del Pedido</h2>
+  </div>
+
+  <div class="row">
+    <!-- Información del Pedido -->
+    <div class="col-lg-8">
+      <div class="card shadow mb-3">
+        <div class="card-header bg-success text-white">
+          <div class="d-flex justify-content-between align-items-center">
+            <h5 class="mb-0"><i class="bi bi-shop-window"></i> {{pedido.comercio.nombreComercio}}</h5>
+            {{#if (eq pedido.estado "pendiente")}}
+              <span class="badge bg-warning text-dark">
+                <i class="bi bi-clock"></i> Pendiente
+              </span>
+            {{else if (eq pedido.estado "en proceso")}}
+              <span class="badge bg-info">
+                <i class="bi bi-truck"></i> En Proceso
+              </span>
+            {{else if (eq pedido.estado "completado")}}
+              <span class="badge bg-light text-success">
+                <i class="bi bi-check-circle"></i> Completado
+              </span>
+            {{/if}}
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="mb-3">
+            <strong><i class="bi bi-calendar"></i> Fecha y Hora:</strong>
+            <p class="mb-0">{{formatDate pedido.fechaHora}}</p>
+          </div>
+
+          <div class="mb-3">
+            <strong><i class="bi bi-geo-alt"></i> Dirección de Entrega:</strong>
+            <p class="mb-0">{{pedido.direccionEntrega}}</p>
+          </div>
+
+          {{#if pedido.delivery}}
+            <div class="alert alert-info">
+              <strong><i class="bi bi-person-badge"></i> Delivery Asignado:</strong><br>
+              {{pedido.delivery.nombre}} {{pedido.delivery.apellido}}
+              <br>
+              <small><i class="bi bi-telephone"></i> {{pedido.delivery.telefono}}</small>
+            </div>
+          {{/if}}
+        </div>
+      </div>
+
+      <!-- Productos -->
+      <div class="card shadow">
+        <div class="card-header">
+          <h5 class="mb-0"><i class="bi bi-box-seam"></i> Productos del Pedido</h5>
+        </div>
+        <div class="card-body">
+          <div class="list-group list-group-flush">
+            {{#each pedido.productos}}
+              <div class="list-group-item d-flex align-items-center">
+                {{#if this.imagen}}
+                  <img src="{{this.imagen}}" alt="{{this.nombre}}" class="me-3 rounded" style="width: 60px; height: 60px; object-fit: cover;">
+                {{else}}
+                  <div class="me-3 bg-light rounded d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
+                    <i class="bi bi-image text-muted"></i>
+                  </div>
+                {{/if}}
+                <div class="flex-grow-1">
+                  <h6 class="mb-0">{{this.nombre}}</h6>
+                  <small class="text-muted">{{this.descripcion}}</small>
+                </div>
+                <span class="fw-bold text-success">{{formatCurrency this.precio}}</span>
+              </div>
+            {{/each}}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Resumen -->
+    <div class="col-lg-4">
+      <div class="card shadow sticky-top" style="top: 20px;">
+        <div class="card-header bg-primary text-white">
+          <h5 class="mb-0"><i class="bi bi-calculator"></i> Resumen</h5>
+        </div>
+        <div class="card-body">
+          <div class="d-flex justify-content-between mb-2">
+            <span>Subtotal:</span>
+            <strong>{{formatCurrency pedido.subtotal}}</strong>
+          </div>
+          <div class="d-flex justify-content-between mb-2">
+            <span>ITBIS:</span>
+            <strong>{{formatCurrency (subtract pedido.total pedido.subtotal)}}</strong>
+          </div>
+          <hr>
+          <div class="d-flex justify-content-between">
+            <strong class="fs-5">Total:</strong>
+            <strong class="fs-5 text-success">{{formatCurrency pedido.total}}</strong>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

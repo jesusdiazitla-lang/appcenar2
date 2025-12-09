@@ -1,0 +1,55 @@
+<div class="container py-4">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <div class="card shadow">
+        <div class="card-header bg-success text-white">
+          <h4 class="mb-0"><i class="bi bi-plus-circle"></i> Nueva Dirección</h4>
+        </div>
+        <div class="card-body p-4">
+          <form action="/cliente/direcciones/crear" method="POST">
+            <div class="mb-3">
+              <label for="nombre" class="form-label fw-bold">
+                <i class="bi bi-tag"></i> Nombre de la Dirección *
+              </label>
+              <input 
+                type="text" 
+                class="form-control" 
+                id="nombre" 
+                name="nombre" 
+                placeholder="Ej: Casa, Trabajo, Casa de mamá"
+                required
+              >
+              <small class="text-muted">Un nombre para identificar esta dirección</small>
+            </div>
+
+            <div class="mb-3">
+              <label for="descripcion" class="form-label fw-bold">
+                <i class="bi bi-geo-alt"></i> Dirección Completa *
+              </label>
+              <textarea 
+                class="form-control" 
+                id="descripcion" 
+                name="descripcion" 
+                rows="4" 
+                placeholder="Ej: Calle Principal #123, Sector Los Jardines, Santo Domingo Este"
+                required
+              ></textarea>
+              <small class="text-muted">Incluye calle, número, sector, referencias, etc.</small>
+            </div>
+
+            <hr class="my-4">
+
+            <div class="d-grid gap-2">
+              <button type="submit" class="btn btn-success btn-lg">
+                <i class="bi bi-check-circle"></i> Guardar Dirección
+              </button>
+              <a href="/cliente/direcciones" class="btn btn-outline-secondary">
+                <i class="bi bi-x-circle"></i> Cancelar
+              </a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

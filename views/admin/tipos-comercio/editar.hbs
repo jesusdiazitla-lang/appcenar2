@@ -1,0 +1,82 @@
+<div class="container py-4">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <div class="card shadow">
+        <div class="card-header bg-warning text-dark">
+          <h4 class="mb-0"><i class="bi bi-pencil"></i> Editar Tipo de Comercio</h4>
+        </div>
+        <div class="card-body p-4">
+          <form action="/admin/tipos-comercio/editar/{{tipoComercio._id}}" method="POST" enctype="multipart/form-data">
+            
+            <div class="mb-3">
+              <label for="nombre" class="form-label fw-bold">
+                <i class="bi bi-tag"></i> Nombre del Tipo *
+              </label>
+              <input 
+                type="text" 
+                class="form-control" 
+                id="nombre" 
+                name="nombre" 
+                value="{{tipoComercio.nombre}}"
+                required
+                autofocus
+              >
+              <small class="text-muted">Un nombre descriptivo para este tipo de comercio</small>
+            </div>
+
+            <div class="mb-3">
+              <label for="descripcion" class="form-label fw-bold">
+                <i class="bi bi-text-paragraph"></i> Descripción *
+              </label>
+              <textarea 
+                class="form-control" 
+                id="descripcion" 
+                name="descripcion" 
+                rows="4" 
+                required
+              >{{tipoComercio.descripcion}}</textarea>
+              <small class="text-muted">Ayuda a los comercios a identificar su tipo</small>
+            </div>
+
+            <!-- Icono Actual -->
+            {{#if tipoComercio.icono}}
+              <div class="mb-3">
+                <label class="form-label fw-bold">
+                  <i class="bi bi-image"></i> Icono Actual
+                </label>
+                <div class="text-center mb-2">
+                  <img src="{{tipoComercio.icono}}" alt="{{tipoComercio.nombre}}" style="max-height: 100px; object-fit: contain;">
+                </div>
+              </div>
+            {{/if}}
+
+            <div class="mb-3">
+              <label for="icono" class="form-label fw-bold">
+                <i class="bi bi-image"></i> Cambiar Icono (Opcional)
+              </label>
+              <input 
+                type="file" 
+                class="form-control" 
+                id="icono" 
+                name="icono"
+                accept="image/*"
+              >
+              <small class="text-muted">Deja en blanco si no quieres cambiar el icono</small>
+            </div>
+
+            <hr class="my-4">
+
+            <div class="d-grid gap-2">
+              <button type="submit" class="btn btn-warning btn-lg text-dark">
+                <i class="bi bi-check-circle"></i> Guardar Cambios
+              </button>
+              <a href="/admin/tipos-comercio" class="btn btn-outline-secondary">
+                <i class="bi bi-x-circle"></i> Cancelar
+              </a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

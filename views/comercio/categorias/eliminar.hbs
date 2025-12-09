@@ -1,0 +1,36 @@
+<div class="container py-4">
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+      <div class="card shadow">
+        <div class="card-body text-center p-5">
+          <i class="bi bi-exclamation-triangle display-1 text-danger d-block mb-4"></i>
+          
+          <h3 class="fw-bold mb-3">¿Eliminar Categoría?</h3>
+          
+          <div class="alert alert-light text-start mb-4">
+            <strong><i class="bi bi-tag-fill text-danger"></i> {{categoria.nombre}}</strong>
+            <p class="mb-0 text-muted mt-2">{{categoria.descripcion}}</p>
+          </div>
+          
+          <div class="alert alert-warning text-start">
+            <i class="bi bi-info-circle"></i> <strong>Advertencia:</strong>
+            <p class="mb-0 small">Los productos de esta categoría quedarán sin categoría asignada.</p>
+          </div>
+          
+          <p class="text-muted mb-4">
+            Esta acción no se puede deshacer.
+          </p>
+
+          <form action="/comercio/categorias/eliminar/{{categoria._id}}" method="POST" class="d-grid gap-2">
+            <button type="submit" class="btn btn-danger btn-lg">
+              <i class="bi bi-trash"></i> Sí, Eliminar Categoría
+            </button>
+            <a href="/comercio/categorias" class="btn btn-outline-secondary">
+              <i class="bi bi-x-circle"></i> No, Cancelar
+            </a>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

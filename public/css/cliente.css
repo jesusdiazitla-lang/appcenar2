@@ -1,0 +1,141 @@
+/* ========================================
+   AppCenar - Estilos del Cliente
+   ======================================== */
+
+/* Layout General */
+body {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: #f8f9fa;
+}
+
+main {
+  flex: 1;
+}
+
+/* Cards con efecto hover */
+.hover-card {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  cursor: pointer;
+  border-radius: 10px;
+  border: none;
+}
+
+.hover-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+}
+
+/* Efecto hover para listados */
+.hover-shadow {
+  transition: box-shadow 0.3s ease;
+}
+
+.hover-shadow:hover {
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+}
+
+/* Cards de direcciones */
+.direccion-card {
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border-radius: 8px;
+}
+
+.direccion-card:hover {
+  border-color: #198754;
+  box-shadow: 0 0 10px rgba(25, 135, 84, 0.2);
+}
+
+.direccion-card input:checked + label {
+  color: #198754;
+}
+
+/* Cards de productos */
+.producto-card {
+  transition: transform 0.2s ease;
+}
+
+.producto-card:hover {
+  transform: translateY(-3px);
+}
+
+/* Carrito */
+#carrito-body {
+  max-height: 60vh;
+  overflow-y: auto;
+}
+
+/* Badges de estado */
+.badge {
+  padding: 0.5rem 1rem;
+  font-weight: 500;
+}
+
+/* Botones */
+.btn {
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Cards generales */
+.card {
+  border: none;
+  border-radius: 10px;
+  margin-bottom: 1rem;
+}
+
+/* Navbar */
+.navbar {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Inputs */
+.form-control,
+.form-select {
+  border-radius: 8px;
+  padding: 0.65rem 1rem;
+}
+
+/* Imágenes de productos */
+img {
+  border-radius: 8px;
+}
+
+/* Footer */
+footer {
+  margin-top: auto;
+}
+
+/* Scrollbar personalizado para carrito */
+#carrito-body::-webkit-scrollbar {
+  width: 8px;
+}
+
+#carrito-body::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+#carrito-body::-webkit-scrollbar-thumb {
+  background: #198754;
+  border-radius: 10px;
+}
+
+#carrito-body::-webkit-scrollbar-thumb:hover {
+  background: #157347;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .sticky-top {
+    position: relative !important;
+    top: 0 !important;
+  }
+}

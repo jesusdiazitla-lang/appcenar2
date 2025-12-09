@@ -1,0 +1,34 @@
+<div class="container py-4">
+  <div class="text-center mb-5">
+    <h1 class="display-4 fw-bold">¡Bienvenido a AppCenar!</h1>
+    <p class="lead text-muted">¿Qué tipo de comercio estás buscando hoy?</p>
+  </div>
+
+  {{#if tiposComercio.length}}
+    <div class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-4">
+      {{#each tiposComercio}}
+        <div class="col">
+          <a href="/cliente/comercios/{{this._id}}" class="text-decoration-none">
+            <div class="card h-100 shadow-sm hover-card">
+              <div class="card-body text-center p-4">
+                {{#if this.icono}}
+                  <img src="{{this.icono}}" alt="{{this.nombre}}" class="img-fluid mb-3" style="max-height: 100px; object-fit: contain;">
+                {{else}}
+                  <i class="bi bi-shop display-1 text-primary mb-3"></i>
+                {{/if}}
+                <h5 class="card-title fw-bold">{{this.nombre}}</h5>
+                <p class="card-text text-muted small">{{this.descripcion}}</p>
+              </div>
+            </div>
+          </a>
+        </div>
+      {{/each}}
+    </div>
+  {{else}}
+    <div class="alert alert-info text-center" role="alert">
+      <i class="bi bi-info-circle fs-1 d-block mb-3"></i>
+      <h4>No hay tipos de comercios disponibles</h4>
+      <p class="mb-0">Por favor, contacta con el administrador.</p>
+    </div>
+  {{/if}}
+</div>
