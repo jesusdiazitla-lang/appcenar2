@@ -106,6 +106,12 @@
                 <option value="{{this._id}}">{{this.nombre}}</option>
               {{/each}}
             </select>
+            {{#unless tiposComercio.length}}
+              <small class="text-danger d-block mt-2">
+                <i class="bi bi-exclamation-triangle"></i> 
+                No hay tipos de comercio disponibles. Contacta al administrador.
+              </small>
+            {{/unless}}
           </div>
 
           <div class="row">
@@ -139,7 +145,11 @@
             </div>
           </div>
 
-          <button type="submit" class="btn btn-primary w-100 py-2 mt-3">
+          <button 
+            type="submit" 
+            class="btn btn-primary w-100 py-2 mt-3"
+            {{#unless tiposComercio.length}}disabled{{/unless}}
+          >
             <i class="bi bi-shop-window"></i> Registrar Comercio
           </button>
         </form>

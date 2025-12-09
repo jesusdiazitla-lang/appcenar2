@@ -9,7 +9,6 @@ const isAuthenticated = (req, res, next) => {
     return res.redirect("/auth/login");
 };
 
-
 const isNotAuthenticated = (req, res, next) => {
     const user = req.session?.user;
 
@@ -18,7 +17,7 @@ const isNotAuthenticated = (req, res, next) => {
         return next();
     }
 
-    // Caso 2: Usuario SÍ autenticado (Previene ver login/registro y redirige a su dashboard)
+    // Caso 2: Usuario SÍ autenticado (Redirige a su dashboard)
     const redirectPaths = {
         cliente: "/cliente/home",
         comercio: "/comercio/home",
@@ -27,19 +26,11 @@ const isNotAuthenticated = (req, res, next) => {
     };
 
     const destino = redirectPaths[user.rol] || "/";
-    const rutaActual = req.originalUrl.split("?")[0];
-
-    // Si el usuario ya está en su dashboard, le permitimos el paso para evitar
-    // que el middleware lo redirija nuevamente a la misma página (bucle).
-    if (rutaActual.startsWith(destino)) {
-        return next();
-    }
     
-    // Si el usuario está logueado pero intenta acceder a una ruta de autenticación,
-    // lo redirigimos a su dashboard.
+    // ✅ CORRECCIÓN: Ya no verificamos si está en su dashboard
+    // Simplemente redirigimos si está autenticado intentando acceder a rutas públicas
     return res.redirect(destino);
 };
-
 
 module.exports = {
     isAuthenticated,

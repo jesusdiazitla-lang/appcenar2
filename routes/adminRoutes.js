@@ -1,47 +1,53 @@
 const express = require('express');
 const router = express.Router();
-const comercioController = require('../controllers/comercioController');
-const categoriaController = require('../controllers/categoriaController');
-const productoController = require('../controllers/productoController');
+const adminController = require('../controllers/adminController');
+const tipoComercioController = require('../controllers/tipoComercioController');
+const configuracionController = require('../controllers/configuracionController');
 const auth = require('../middleware/auth');
 const checkRole = require('../middleware/roles');
 const checkActiveAccount = require('../middleware/checkActiveAccount');
 const upload = require('../config/multer');
-const { validatePerfilComercio, validateCategoria, validateProducto } = require('../middleware/validators');
 
 // Aplicar middleware de autenticación y rol a todas las rutas
 router.use(auth.isAuthenticated);
-router.use(checkRole('cliente'));
+router.use(checkRole('administrador')); // ✅ CORREGIDO - ahora verifica rol de administrador
 router.use(checkActiveAccount);
 
+// Dashboard principal
+router.get('/dashboard', adminController.mostrarDashboard);
 
-// Home del comercio (listado de pedidos)
-router.get('/home', comercioController.mostrarHome);
+// Gestión de Clientes
+router.get('/clientes', adminController.listarClientes);
+router.post('/clientes/toggle-activo/:clienteId', adminController.toggleActivoCliente);
 
-// Detalle de pedido y asignar delivery
-router.get('/pedido/:pedidoId', comercioController.mostrarDetallePedido);
-router.post('/pedido/:pedidoId/asignar-delivery', comercioController.asignarDelivery);
+// Gestión de Deliveries
+router.get('/deliveries', adminController.listarDeliveries);
+router.post('/deliveries/toggle-activo/:deliveryId', adminController.toggleActivoDelivery);
 
-// Perfil del comercio
-router.get('/perfil', comercioController.mostrarPerfil);
-router.post('/perfil', upload.single('logoComercio'), validatePerfilComercio, comercioController.actualizarPerfil);
+// Gestión de Comercios
+router.get('/comercios', adminController.listarComercios);
+router.post('/comercios/toggle-activo/:comercioId', adminController.toggleActivoComercio);
 
-// Mantenimiento de categorías
-router.get('/categorias', categoriaController.listar);
-router.get('/categorias/crear', categoriaController.mostrarCrear);
-router.post('/categorias/crear', validateCategoria, categoriaController.crear);
-router.get('/categorias/editar/:categoriaId', categoriaController.mostrarEditar);
-router.post('/categorias/editar/:categoriaId', validateCategoria, categoriaController.editar);
-router.get('/categorias/eliminar/:categoriaId', categoriaController.mostrarEliminar);
-router.post('/categorias/eliminar/:categoriaId', categoriaController.eliminar);
+// Gestión de Administradores
+router.get('/administradores', adminController.listarAdministradores);
+router.get('/administradores/crear', adminController.mostrarCrearAdministrador);
+router.post('/administradores/crear', adminController.crearAdministrador);
+router.get('/administradores/editar/:adminId', adminController.mostrarEditarAdministrador);
+router.post('/administradores/editar/:adminId', adminController.editarAdministrador);
+router.post('/administradores/toggle-activo/:adminId', adminController.toggleActivoAdministrador);
 
-// Mantenimiento de productos
-router.get('/productos', productoController.listar);
-router.get('/productos/crear', productoController.mostrarCrear);
-router.post('/productos/crear', upload.single('imagen'), validateProducto, productoController.crear);
-router.get('/productos/editar/:productoId', productoController.mostrarEditar);
-router.post('/productos/editar/:productoId', upload.single('imagen'), validateProducto, productoController.editar);
-router.get('/productos/eliminar/:productoId', productoController.mostrarEliminar);
-router.post('/productos/eliminar/:productoId', productoController.eliminar);
+// Gestión de Tipos de Comercio
+router.get('/tipos-comercio', tipoComercioController.listar);
+router.get('/tipos-comercio/crear', tipoComercioController.mostrarCrear);
+router.post('/tipos-comercio/crear', upload.single('icono'), tipoComercioController.crear);
+router.get('/tipos-comercio/editar/:tipoId', tipoComercioController.mostrarEditar);
+router.post('/tipos-comercio/editar/:tipoId', upload.single('icono'), tipoComercioController.editar);
+router.get('/tipos-comercio/eliminar/:tipoId', tipoComercioController.mostrarEliminar);
+router.post('/tipos-comercio/eliminar/:tipoId', tipoComercioController.eliminar);
+
+// Configuración del Sistema
+router.get('/configuracion', configuracionController.mostrar);
+router.get('/configuracion/editar', configuracionController.mostrarEditar);
+router.post('/configuracion/editar', configuracionController.editar);
 
 module.exports = router;

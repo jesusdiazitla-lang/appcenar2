@@ -62,46 +62,49 @@ const validateClienteRegistro = [
 
 // ... (El resto de las validaciones permanecen sin cambios)
 
+// Extracto de middleware/validators.js
+// Solo la validación de registro de comercio corregida
+
 const validateComercioRegistro = [
-  body('nombreComercio')
-    .trim()
-    .notEmpty().withMessage('El nombre del comercio es requerido')
-    .isLength({ min: 3, max: 100 }).withMessage('El nombre debe tener entre 3 y 100 caracteres'),
-  
-  body('telefono')
-    .trim()
-    .notEmpty().withMessage('El teléfono es requerido')
-    .matches(/^[0-9]{10}$/).withMessage('El teléfono debe tener 10 dígitos'),
-  
-  body('correo')
-    .trim()
-    .notEmpty().withMessage('El correo es requerido')
-    .isEmail().withMessage('Debe ser un correo válido')
-    .normalizeEmail(),
-  
-  body('horaApertura')
-    .notEmpty().withMessage('La hora de apertura es requerida'),
-  
-  body('horaCierre')
-    .notEmpty().withMessage('La hora de cierre es requerida'),
-  
-  body('tipoComercioId')
-    .notEmpty().withMessage('Debes seleccionar un tipo de comercio'),
-  
-  body('password')
-    .notEmpty().withMessage('La contraseña es requerida')
-    .isLength({ min: 6 }).withMessage('La contraseña debe tener al menos 6 caracteres'),
-  
-  body('confirmarPassword')
-    .notEmpty().withMessage('Debes confirmar la contraseña')
-    .custom((value, { req }) => {
-      if (value !== req.body.password) {
-        throw new Error('Las contraseñas no coinciden');
-      }
-      return true;
-    }),
-  
-  handleValidationErrors
+  body('nombreComercio')
+    .trim()
+    .notEmpty().withMessage('El nombre del comercio es requerido')
+    .isLength({ min: 3, max: 100 }).withMessage('El nombre debe tener entre 3 y 100 caracteres'),
+  
+  body('telefono')
+    .trim()
+    .notEmpty().withMessage('El teléfono es requerido')
+    .matches(/^[0-9]{10}$/).withMessage('El teléfono debe tener 10 dígitos'),
+  
+  body('correo')
+    .trim()
+    .notEmpty().withMessage('El correo es requerido')
+    .isEmail().withMessage('Debe ser un correo válido')
+    .normalizeEmail(),
+  
+  body('horaApertura')
+    .notEmpty().withMessage('La hora de apertura es requerida'),
+  
+  body('horaCierre')
+    .notEmpty().withMessage('La hora de cierre es requerida'),
+  
+  body('tipoComercio') // ✅ CORREGIDO - ahora coincide con el nombre del campo
+    .notEmpty().withMessage('Debes seleccionar un tipo de comercio'),
+  
+  body('password')
+    .notEmpty().withMessage('La contraseña es requerida')
+    .isLength({ min: 6 }).withMessage('La contraseña debe tener al menos 6 caracteres'),
+  
+  body('confirmarPassword')
+    .notEmpty().withMessage('Debes confirmar la contraseña')
+    .custom((value, { req }) => {
+      if (value !== req.body.password) {
+        throw new Error('Las contraseñas no coinciden');
+      }
+      return true;
+    }),
+  
+  handleValidationErrors
 ];
 
 // ... (Incluye el resto de las validaciones aquí) ...
@@ -163,18 +166,18 @@ const validatePerfilComercio = [
 
 
 module.exports = {
-  validateClienteRegistro,
-  validateComercioRegistro,
-  validateLogin,
-  validateForgotPassword,
-  validateResetPassword,
-  validatePerfil,
-  validateDireccion,
-  validateCategoria,
-  validateProducto,
-  validateTipoComercio,
-  validateAdministrador,
-  validateConfiguracion,
-  validatePerfilComercio,
-  handleValidationErrors
+  validateClienteRegistro,
+  validateComercioRegistro,
+  validateLogin,
+  validateForgotPassword,
+  validateResetPassword,
+  validatePerfil,
+  validateDireccion,
+  validateCategoria,
+  validateProducto,
+  validateTipoComercio,
+  validateAdministrador,
+  validateConfiguracion,
+  validatePerfilComercio,
+  handleValidationErrors
 };

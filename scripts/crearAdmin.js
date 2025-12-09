@@ -1,6 +1,5 @@
 require('dotenv').config();
 const mongoose = require('mongoose');
-const bcrypt = require('bcryptjs');
 const Usuario = require('../models/Usuario');
 
 async function crearAdminInicial() {
@@ -28,28 +27,30 @@ async function crearAdminInicial() {
       console.log(`✅ Estado: ${adminExistente.activo ? 'Activo' : 'Inactivo'}`);
       console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
       
+      // Preguntar si quiere actualizar la contraseña
+      console.log('💡 Si quieres resetear la contraseña del admin existente:');
+      console.log('   1. Elimina el usuario admin de la base de datos');
+      console.log('   2. Vuelve a ejecutar este script\n');
+      
       await mongoose.disconnect();
       process.exit(0);
     }
 
-    // Hash de la contraseña
-    console.log('🔐 Generando contraseña segura...');
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash('admin123', salt);
+    // ⚠️ CRÍTICO: NO HASHEAR AQUÍ - EL HOOK DEL MODELO LO HACE
+    console.log('🔐 Creando administrador...');
 
-    // Crear administrador
     const admin = new Usuario({
       nombre: 'Admin',
       apellido: 'Sistema',
       cedula: '00000000000',
       correo: 'admin@appcenar.com',
       nombreUsuario: 'admin',
-      password: hashedPassword,
+      password: 'admin123', // ← En texto plano, el hook pre('save') lo hashea
       rol: 'administrador',
-      activo: true
+      activo: true // ← Ya activo, no necesita email de activación
     });
 
-    await admin.save();
+    await admin.save(); // ← Aquí el hook pre('save') hashea la contraseña
 
     console.log('✅ ¡Administrador creado exitosamente!\n');
     console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');

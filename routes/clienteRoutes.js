@@ -3,7 +3,8 @@ const router = express.Router();
 const clienteController = require('../controllers/clienteController');
 const direccionController = require('../controllers/direccionController');
 const favoritoController = require('../controllers/favoritoController');
-const pedidoController = require('../controllers/pedidoController');
+// ❌ NO USAR pedidoController para crear pedidos desde cliente
+// const pedidoController = require('../controllers/pedidoController');
 const auth = require('../middleware/auth');
 const checkRole = require('../middleware/roles');
 const checkActiveAccount = require('../middleware/checkActiveAccount');
@@ -14,7 +15,6 @@ const { validatePerfil, validateDireccion } = require('../middleware/validators'
 router.use(auth.isAuthenticated);
 router.use(checkRole('cliente'));
 router.use(checkActiveAccount);
-
 
 // Home del cliente
 router.get('/home', clienteController.mostrarHome);
@@ -27,7 +27,8 @@ router.get('/catalogo/:comercioId', clienteController.mostrarCatalogo);
 
 // Seleccionar dirección y crear pedido
 router.post('/seleccionar-direccion', clienteController.seleccionarDireccion);
-router.post('/crear-pedido', pedidoController.crear);
+// ✅ CORRECCIÓN: Usar clienteController.crearPedido en lugar de pedidoController.crear
+router.post('/crear-pedido', clienteController.crearPedido);
 
 // Perfil del cliente
 router.get('/perfil', clienteController.mostrarPerfil);
@@ -51,6 +52,3 @@ router.get('/favoritos', clienteController.listarFavoritos);
 router.post('/favorito/toggle/:comercioId', favoritoController.toggle);
 
 module.exports = router;
-console.log('auth:', auth);
-console.log('checkRole:', checkRole);
-console.log('checkActiveAccount:', checkActiveAccount);

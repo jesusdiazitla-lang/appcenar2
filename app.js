@@ -29,12 +29,30 @@ app.set('view engine', 'hbs');
 app.set('views', path.join(__dirname, 'views'));
 hbs.registerPartials(path.join(__dirname, 'views', 'partials'));
 
-// Helpers
+// ========== HELPERS DE HANDLEBARS ==========
+
+// Helper para comparación de igualdad
 hbs.registerHelper('eq', (a, b) => a == b);
+
+// Helper para OR lógico
 hbs.registerHelper('or', (a, b) => a || b);
+
+// Helper para AND lógico
 hbs.registerHelper('and', (a, b) => a && b);
+
+// Helper para NOT lógico
 hbs.registerHelper('not', (a) => !a);
+
+// Helper para convertir a JSON
 hbs.registerHelper('json', (context) => JSON.stringify(context));
+
+// ✅ Helper para verificar si un elemento está en un array
+hbs.registerHelper('includes', function(array, value) {
+  if (!Array.isArray(array)) return false;
+  return array.includes(value.toString());
+});
+
+// Helper para formatear fechas
 hbs.registerHelper('formatDate', function (date) {
   if (!date) return '';
   const d = new Date(date);
@@ -46,9 +64,38 @@ hbs.registerHelper('formatDate', function (date) {
     minute: '2-digit'
   });
 });
-hbs.registerHelper('formatCurrency', (amount) =>
-  `RD$${Number(amount).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}`
-);
+
+// Helper para formatear moneda
+hbs.registerHelper('formatCurrency', (amount) => {
+  if (!amount && amount !== 0) return 'RD$ 0.00';
+  return `RD$${Number(amount).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}`;
+});
+
+// ✅ Helper para operaciones matemáticas
+hbs.registerHelper('subtract', (a, b) => {
+  return Number(a) - Number(b);
+});
+
+hbs.registerHelper('add', (a, b) => {
+  return Number(a) + Number(b);
+});
+
+hbs.registerHelper('multiply', (a, b) => {
+  return Number(a) * Number(b);
+});
+
+hbs.registerHelper('divide', (a, b) => {
+  if (b === 0) return 0;
+  return Number(a) / Number(b);
+});
+
+// ✅ HELPER IMPORTANTE: Convertir ObjectId a String para comparaciones
+hbs.registerHelper('toString', function(value) {
+  if (!value) return '';
+  return value.toString();
+});
+
+console.log('✅ Helpers de Handlebars registrados correctamente');
 
 // ======================================================
 // 🧩 MIDDLEWARES
@@ -59,11 +106,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(methodOverride('_method'));
 app.use(cookieParser(process.env.COOKIE_SECRET));
 
-// ======================================================
-// 🟦 CONFIGURACIÓN DE SESIONES
-// ======================================================
+// ========== CONFIGURACIÓN DE SESIONES ==========
 if (!PREVIEW) {
-  // 🔵 MODO NORMAL (con MongoDB)
   app.use(session({
     secret: process.env.SESSION_SECRET,
     resave: false,
@@ -82,7 +126,6 @@ if (!PREVIEW) {
     }
   }));
 } else {
-  // 🟣 MODO PREVIEW (Sin BD)
   app.use(session({
     secret: 'preview-secret',
     resave: false,
@@ -91,47 +134,29 @@ if (!PREVIEW) {
   console.log("⚠ Usando MemoryStore temporal (solo para preview sin BD)");
 }
 
-// ======================================================
-// 🔥 PREVIEW USER (evita errores de autenticación)
-// ======================================================
-/*if (PREVIEW) {
-  app.use((req, res, next) => {
-    // Puedes cambiar el rol para ver otros paneles:
-    // "cliente" | "comercio" | "delivery" | "administrador"
-    req.session.user = {
-      id: "preview123",
-      nombre: "Demo Comercio",
-      rol: "comercio"
-    };
-    res.locals.isAuthenticated = true;
-    res.locals.currentUser = req.session.user;
-    next();
-  });
-
-  console.log("⚠ Usuario demo cargado: rol comercio");
-}*/
-
-// Flash messages
+// ========== FLASH MESSAGES ==========
 app.use(flash());
 
-// Variables globales para las vistas
+// ========== VARIABLES GLOBALES PARA VISTAS ==========
+// ✅ IMPORTANTE: Este middleware DEBE ir DESPUÉS de session()
 app.use((req, res, next) => {
   res.locals.success = req.flash('success');
   res.locals.error = req.flash('error');
   res.locals.warning = req.flash('warning');
   res.locals.info = req.flash('info');
 
-  if (!PREVIEW) {
-    res.locals.currentUser = req.session.user || null;
-    res.locals.isAuthenticated = !!req.session.user;
-  }
+  // ✅ Siempre establecer estas variables
+  res.locals.currentUser = req.session?.user || null;
+  res.locals.isAuthenticated = !!req.session?.user;
+
+  console.log('🔍 Middleware variables globales:');
+  console.log('   - Usuario en sesión:', req.session?.user?.rol || 'Ninguno');
+  console.log('   - isAuthenticated:', res.locals.isAuthenticated);
 
   next();
 });
 
-// ======================================================
-// 📦 RUTAS
-// ======================================================
+// ========== RUTAS ==========
 const authRoutes = require('./routes/authRoutes');
 const clienteRoutes = require('./routes/clienteRoutes');
 const comercioRoutes = require('./routes/comercioRoutes');
@@ -143,6 +168,8 @@ app.use('/cliente', clienteRoutes);
 app.use('/comercio', comercioRoutes);
 app.use('/delivery', deliveryRoutes);
 app.use('/admin', adminRoutes);
+
+// ... (resto del código)
 
 // Ruta raíz
 app.get('/', (req, res) => {
