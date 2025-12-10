@@ -1,30 +1,34 @@
+// middleware/roles.js - CORREGIDO
+
 // Middleware para verificar roles específicos
 const checkRole = (...roles) => {
   return (req, res, next) => {
+    // ✅ Verificar si hay sesión y usuario
     if (!req.session || !req.session.user) {
       req.flash('error', 'Debes iniciar sesión');
       return res.redirect('/auth/login');
     }
 
+    // ✅ Verificar si el rol del usuario está permitido
     if (!roles.includes(req.session.user.rol)) {
       req.flash('error', 'No tienes permisos para acceder a esta página');
-      return res.status(403).send("Acceso denegado");
-;
+      
+      // ✅ CORRECCIÓN: Redirigir al home del usuario según su rol
+      const redirectPaths = {
+        cliente: '/cliente/home',
+        comercio: '/comercio/home',
+        delivery: '/delivery/home',
+        administrador: '/admin/dashboard'
+      };
+      
+      const destino = redirectPaths[req.session.user.rol] || '/auth/login';
+      return res.redirect(destino);
     }
 
+    // ✅ Si pasa las verificaciones, continuar
     next();
   };
 };
 
-// Middlewares específicos por rol
-const isCliente = checkRole('cliente');
-const isComercio = checkRole('comercio');
-const isDelivery = checkRole('delivery');
-const isAdmin = checkRole('administrador');
-
-// Middleware para múltiples roles
-const isClienteOrAdmin = checkRole('cliente', 'administrador');
-const isComercioOrAdmin = checkRole('comercio', 'administrador');
-const isDeliveryOrAdmin = checkRole('delivery', 'administrador');
-
+// ✅ Exportar la función checkRole
 module.exports = checkRole;

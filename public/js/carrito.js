@@ -1,5 +1,5 @@
 /**
- * carrito.js - Versión con cantidades
+ * carrito.js - Versión CORREGIDA con cantidades
  * Gestión del carrito de compras con soporte para múltiples cantidades
  * AppCenar - Sistema de pedidos delivery
  */
@@ -24,7 +24,7 @@ class CarritoCompras {
    */
   init() {
     if (!this.verificarElementos()) {
-      console.error('Error: No se encontraron todos los elementos necesarios del carrito');
+      console.error('❌ Error: No se encontraron todos los elementos necesarios del carrito');
       return;
     }
 
@@ -58,7 +58,7 @@ class CarritoCompras {
     const card = boton.closest('.producto-card');
     
     if (!card) {
-      console.error('No se encontró la tarjeta del producto');
+      console.error('❌ No se encontró la tarjeta del producto');
       return;
     }
 
@@ -69,20 +69,20 @@ class CarritoCompras {
     };
 
     if (!producto.id || !producto.nombre || isNaN(producto.precio)) {
-      console.error('Datos del producto incompletos', producto);
+      console.error('❌ Datos del producto incompletos', producto);
       this.mostrarAlerta('Error al agregar el producto', 'danger');
       return;
     }
 
-    // Buscar si el producto ya está en el carrito
+    // ✅ CORRECCIÓN: Buscar si el producto ya está en el carrito
     const itemExistente = this.carrito.find(item => item.id === producto.id);
 
     if (itemExistente) {
-      // Incrementar cantidad
+      // ✅ Incrementar cantidad si ya existe
       itemExistente.cantidad++;
       this.mostrarAlerta(`${producto.nombre} (x${itemExistente.cantidad})`, 'success');
     } else {
-      // Agregar nuevo producto con cantidad 1
+      // ✅ Agregar nuevo producto con cantidad 1
       this.carrito.push({
         ...producto,
         cantidad: 1
@@ -92,6 +92,8 @@ class CarritoCompras {
 
     // Actualizar vista del carrito
     this.actualizarCarrito();
+    
+    console.log('🛒 Carrito actualizado:', this.carrito);
   }
 
   /**
@@ -102,6 +104,7 @@ class CarritoCompras {
     if (item) {
       item.cantidad++;
       this.actualizarCarrito();
+      console.log(`➕ Incrementado: ${item.nombre} (x${item.cantidad})`);
     }
   }
 
@@ -113,12 +116,12 @@ class CarritoCompras {
     if (item) {
       if (item.cantidad > 1) {
         item.cantidad--;
+        this.actualizarCarrito();
+        console.log(`➖ Decrementado: ${item.nombre} (x${item.cantidad})`);
       } else {
         // Si cantidad es 1, eliminar el producto
         this.eliminarProducto(id);
-        return;
       }
-      this.actualizarCarrito();
     }
   }
 
@@ -129,7 +132,7 @@ class CarritoCompras {
     const index = this.carrito.findIndex(p => p.id === id);
     
     if (index === -1) {
-      console.error('Producto no encontrado en el carrito');
+      console.error('❌ Producto no encontrado en el carrito');
       return;
     }
 
@@ -138,6 +141,8 @@ class CarritoCompras {
     
     this.actualizarCarrito();
     this.mostrarAlerta(`${productoEliminado.nombre} eliminado`, 'info');
+    
+    console.log('🗑️ Producto eliminado:', productoEliminado);
   }
 
   /**
@@ -241,7 +246,7 @@ class CarritoCompras {
   habilitarContinuar() {
     this.elementos.btnContinuar.disabled = false;
     
-    // Crear array con IDs repetidos según cantidad
+    // ✅ CORRECCIÓN CRÍTICA: Crear array con IDs repetidos según cantidad
     const productosIds = [];
     this.carrito.forEach(item => {
       for (let i = 0; i < item.cantidad; i++) {
@@ -250,6 +255,9 @@ class CarritoCompras {
     });
     
     this.elementos.productosIdsInput.value = JSON.stringify(productosIds);
+    
+    console.log('📦 IDs a enviar:', productosIds);
+    console.log('📊 Total items:', productosIds.length);
   }
 
   /**
@@ -324,18 +332,22 @@ class CarritoCompras {
   vaciarCarrito() {
     this.carrito = [];
     this.actualizarCarrito();
+    console.log('🗑️ Carrito vaciado');
   }
 }
 
-// Inicializar el carrito cuando el DOM esté listo
+// ✅ Inicializar el carrito cuando el DOM esté listo
 let carritoInstance;
 
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', () => {
     carritoInstance = new CarritoCompras();
+    console.log('✅ Carrito inicializado');
   });
 } else {
   carritoInstance = new CarritoCompras();
+  console.log('✅ Carrito inicializado');
 }
 
+// ✅ Exponer la instancia globalmente para uso en onclick
 window.carritoInstance = carritoInstance;

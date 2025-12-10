@@ -1,120 +1,300 @@
 /* ========================================
    AppCenar - Estilos del Comercio
+   Diseño Moderno Unificado - AZUL
    ======================================== */
 
-/* Layout General */
+/* Variables de Color - AZUL para Comercios */
+:root {
+  --primary-color: #2196F3;
+  --primary-dark: #1976D2;
+  --primary-light: #BBDEFB;
+  --secondary-color: #42A5F5;
+  --accent-color: #2979FF;
+  --success-color: #4CAF50;
+  --warning-color: #FFC107;
+  --danger-color: #F44336;
+  --dark-color: #263238;
+  --light-bg: #FAFAFA;
+  --white: #FFFFFF;
+  --text-primary: #263238;
+  --text-secondary: #607D8B;
+  --border-radius: 16px;
+  --border-radius-sm: 12px;
+  --shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  --shadow-hover: 0 8px 30px rgba(0, 0, 0, 0.12);
+}
+
+/* Tipografía */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
 body {
+  font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: linear-gradient(135deg, #E3F2FD 0%, #FAFAFA 100%);
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  background-color: #f8f9fa;
+  color: var(--text-primary);
 }
 
 main {
   flex: 1;
 }
 
-/* Cards */
+/* ===== Navbar Moderna ===== */
+.navbar {
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  padding: 1rem 0;
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%) !important;
+}
+
+.navbar-brand {
+  font-weight: 700;
+  font-size: 1.5rem;
+  letter-spacing: 0.5px;
+}
+
+.nav-link {
+  font-weight: 500;
+  padding: 0.5rem 1rem !important;
+  transition: all 0.3s ease;
+  border-radius: var(--border-radius-sm);
+}
+
+.nav-link:hover {
+  background: rgba(255, 255, 255, 0.15);
+  transform: translateY(-2px);
+}
+
+/* ===== Cards Modernas ===== */
 .card {
   border: none;
-  border-radius: 10px;
-  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
-  margin-bottom: 1rem;
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  background: var(--white);
+  overflow: hidden;
+  margin-bottom: 1.5rem;
 }
 
 .card:hover {
-  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
-  transition: box-shadow 0.3s ease;
+  box-shadow: var(--shadow-hover);
 }
 
-/* Tablas */
-.table {
-  border-radius: 8px;
-  overflow: hidden;
+.pedido-card {
+  transition: all 0.2s ease;
+  border-radius: var(--border-radius-sm);
 }
 
-.table thead th {
-  background-color: #0d6efd;
-  color: white;
-  border: none;
-  font-weight: 600;
+.pedido-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-hover);
 }
 
-.table tbody tr:hover {
-  background-color: #f8f9fa;
-}
-
-/* Badges de estado */
-.badge {
-  padding: 0.5rem 1rem;
-  font-weight: 500;
-  border-radius: 20px;
-}
-
-/* Botones */
+/* ===== Botones Modernos ===== */
 .btn {
-  border-radius: 8px;
+  border-radius: var(--border-radius-sm);
+  padding: 0.75rem 1.75rem;
+  font-weight: 600;
+  font-size: 0.95rem;
+  letter-spacing: 0.3px;
+  border: none;
   transition: all 0.3s ease;
-  font-weight: 500;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
 }
 
-/* Navbar */
-.navbar {
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+.btn-primary {
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+  color: var(--white);
 }
 
-/* Formularios */
+.btn-primary:hover {
+  background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary-color) 100%);
+}
+
+.btn-success {
+  background: linear-gradient(135deg, var(--success-color) 0%, #66BB6A 100%);
+  color: var(--white);
+}
+
+.btn-warning {
+  background: linear-gradient(135deg, var(--warning-color) 0%, #FFD54F 100%);
+  color: var(--dark-color);
+}
+
+.btn-outline-primary {
+  border: 2px solid var(--primary-color);
+  color: var(--primary-color);
+  background: transparent;
+}
+
+.btn-outline-primary:hover {
+  background: var(--primary-color);
+  color: var(--white);
+}
+
+.btn-outline-danger {
+  border: 2px solid var(--danger-color);
+  color: var(--danger-color);
+  background: transparent;
+}
+
+.btn-outline-danger:hover {
+  background: var(--danger-color);
+  color: var(--white);
+}
+
+/* ===== Badges Modernos ===== */
+.badge {
+  padding: 0.5rem 1rem;
+  font-weight: 600;
+  border-radius: 50px;
+  font-size: 0.85rem;
+  letter-spacing: 0.3px;
+}
+
+.badge.bg-primary {
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%) !important;
+}
+
+.badge.bg-success {
+  background: linear-gradient(135deg, var(--success-color) 0%, #66BB6A 100%) !important;
+}
+
+.badge.bg-warning {
+  background: linear-gradient(135deg, var(--warning-color) 0%, #FFD54F 100%) !important;
+}
+
+.badge.bg-info {
+  background: linear-gradient(135deg, #00BCD4 0%, #26C6DA 100%) !important;
+}
+
+/* ===== Tablas Modernas ===== */
+.table {
+  border-radius: var(--border-radius-sm);
+  overflow: hidden;
+}
+
+.table thead th {
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+  color: white;
+  border: none;
+  font-weight: 600;
+  padding: 1rem;
+}
+
+.table tbody tr {
+  transition: all 0.2s ease;
+}
+
+.table tbody tr:hover {
+  background-color: #F5F9FC;
+  transform: scale(1.01);
+}
+
+/* ===== Inputs Modernos ===== */
 .form-control,
 .form-select {
-  border-radius: 8px;
-  padding: 0.65rem 1rem;
-  border: 1px solid #dee2e6;
+  border-radius: var(--border-radius-sm);
+  padding: 0.875rem 1.25rem;
+  border: 2px solid #E0E0E0;
+  transition: all 0.3s ease;
+  font-size: 0.95rem;
+  background: var(--white);
 }
 
 .form-control:focus,
 .form-select:focus {
-  border-color: #0d6efd;
-  box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.15);
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 4px rgba(33, 150, 243, 0.1);
+  background: var(--white);
 }
 
-/* Imágenes */
-img {
-  border-radius: 8px;
+/* ===== Alertas Modernas ===== */
+.alert {
+  border-radius: var(--border-radius-sm);
+  border: none;
+  padding: 1rem 1.25rem;
+  font-weight: 500;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
-/* Footer */
-footer {
-  margin-top: auto;
+.alert-success {
+  background: linear-gradient(135deg, #E8F5E9 0%, #C8E6C9 100%);
+  color: #2E7D32;
 }
 
-/* Cards de pedidos */
-.pedido-card {
-  transition: transform 0.2s ease;
+.alert-info {
+  background: linear-gradient(135deg, #E3F2FD 0%, #BBDEFB 100%);
+  color: #1565C0;
 }
 
-.pedido-card:hover {
-  transform: translateY(-3px);
+.alert-warning {
+  background: linear-gradient(135deg, #FFF8E1 0%, #FFECB3 100%);
+  color: #F57F17;
 }
 
-/* Lista de productos/categorías */
+/* ===== List Group ===== */
 .list-group-item {
-  border-radius: 8px;
+  border-radius: var(--border-radius-sm);
   margin-bottom: 0.5rem;
-  border: 1px solid #dee2e6;
+  border: 2px solid #E0E0E0;
   transition: all 0.2s ease;
 }
 
 .list-group-item:hover {
-  background-color: #f8f9fa;
-  border-color: #0d6efd;
+  background-color: #F5F9FC;
+  border-color: var(--primary-color);
+  transform: translateX(4px);
 }
 
-/* Responsive */
+/* ===== Tipografía ===== */
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.fw-bold {
+  font-weight: 700 !important;
+}
+
+.text-muted {
+  color: var(--text-secondary) !important;
+}
+
+/* ===== Imágenes ===== */
+img {
+  border-radius: var(--border-radius-sm);
+}
+
+/* ===== Footer ===== */
+footer {
+  margin-top: auto;
+  background: var(--dark-color) !important;
+  box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.08);
+}
+
+/* ===== Animaciones ===== */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.card {
+  animation: fadeInUp 0.4s ease-out;
+}
+
+/* ===== Responsive ===== */
 @media (max-width: 768px) {
   .table {
     font-size: 0.9rem;
@@ -122,6 +302,10 @@ footer {
   
   .btn-sm {
     font-size: 0.75rem;
-    padding: 0.25rem 0.5rem;
+    padding: 0.4rem 0.8rem;
+  }
+  
+  .btn {
+    padding: 0.65rem 1.5rem;
   }
 }
