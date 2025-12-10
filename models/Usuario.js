@@ -82,10 +82,18 @@ const usuarioSchema = new mongoose.Schema({
   },
 
   // Campos específicos para delivery
-  disponible: {
-    type: Boolean,
-    default: true
-  },
+  // En la sección de campos específicos para delivery, REEMPLAZA:
+disponible: {
+  type: Boolean,
+  default: true
+},
+
+// POR:
+estadoDisponibilidad: {
+  type: String,
+  enum: ['disponible', 'ocupado'],
+  default: 'disponible'
+},
 
   // Campos específicos para administrador
   cedula: {

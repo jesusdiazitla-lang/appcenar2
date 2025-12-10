@@ -24,17 +24,34 @@ exports.mostrarHome = async (req, res) => {
 exports.mostrarDetallePedido = async (req, res) => {
   try {
     const { pedidoId } = req.params;
+    
+    console.log('🔍 Buscando pedido:', pedidoId);
+    
     const pedido = await Pedido.findById(pedidoId)
       .populate('comercio')
-      .populate('productos')
+      .populate('productos.producto')
+      .populate('direccion')  // ✅ Populate de la dirección
       .populate('cliente');
+
+    if (!pedido) {
+      console.error('❌ Pedido no encontrado');
+      req.flash('error', 'Pedido no encontrado');
+      return res.redirect('/delivery/home');
+    }
+
+    console.log('📦 Pedido encontrado:');
+    console.log('   - Estado:', pedido.estado);
+    console.log('   - Cliente:', pedido.cliente?.nombre);
+    console.log('   - Dirección ID:', pedido.direccion?._id);
+    console.log('   - Dirección nombre:', pedido.direccion?.nombre);
+    console.log('   - Dirección descripción:', pedido.direccion?.descripcion);
 
     res.render('delivery/pedido-detalle', {
       layout: 'layouts/delivery',
       pedido
     });
   } catch (error) {
-    console.error(error);
+    console.error('❌ Error en mostrarDetallePedido:', error);
     req.flash('error', 'Error al cargar detalle del pedido');
     res.redirect('/delivery/home');
   }

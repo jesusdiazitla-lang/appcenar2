@@ -1,12 +1,12 @@
 /**
- * carrito.js
- * Gestión del carrito de compras en el catálogo de productos
+ * carrito.js - Versión con cantidades
+ * Gestión del carrito de compras con soporte para múltiples cantidades
  * AppCenar - Sistema de pedidos delivery
  */
 
 class CarritoCompras {
   constructor() {
-    this.carrito = [];
+    this.carrito = []; // Array de {id, nombre, precio, cantidad}
     this.elementos = {
       productosCarrito: document.getElementById('productos-carrito'),
       subtotalSpan: document.getElementById('subtotal-carrito'),
@@ -23,16 +23,12 @@ class CarritoCompras {
    * Inicializa el carrito y sus event listeners
    */
   init() {
-    // Verificar que todos los elementos existen
     if (!this.verificarElementos()) {
       console.error('Error: No se encontraron todos los elementos necesarios del carrito');
       return;
     }
 
-    // Agregar event listeners a todos los botones de agregar producto
     this.attachEventListeners();
-
-    // Inicializar estado del carrito
     this.actualizarCarrito();
   }
 
@@ -55,8 +51,7 @@ class CarritoCompras {
   }
 
   /**
-   * Agrega un producto al carrito
-   * @param {Event} event - Evento del click
+   * Agrega un producto al carrito o incrementa su cantidad
    */
   agregarProducto(event) {
     const boton = event.currentTarget;
@@ -73,72 +68,62 @@ class CarritoCompras {
       precio: parseFloat(card.dataset.precio)
     };
 
-    // Validar que el producto tiene todos los datos necesarios
     if (!producto.id || !producto.nombre || isNaN(producto.precio)) {
       console.error('Datos del producto incompletos', producto);
       this.mostrarAlerta('Error al agregar el producto', 'danger');
       return;
     }
 
-    // Verificar si el producto ya está en el carrito
-    if (this.productoEnCarrito(producto.id)) {
-      this.mostrarAlerta('Este producto ya está en tu pedido', 'warning');
-      return;
+    // Buscar si el producto ya está en el carrito
+    const itemExistente = this.carrito.find(item => item.id === producto.id);
+
+    if (itemExistente) {
+      // Incrementar cantidad
+      itemExistente.cantidad++;
+      this.mostrarAlerta(`${producto.nombre} (x${itemExistente.cantidad})`, 'success');
+    } else {
+      // Agregar nuevo producto con cantidad 1
+      this.carrito.push({
+        ...producto,
+        cantidad: 1
+      });
+      this.mostrarAlerta(`${producto.nombre} agregado`, 'success');
     }
 
-    // Agregar producto al carrito
-    this.carrito.push(producto);
-    
-    // Actualizar UI del botón
-    this.deshabilitarBoton(boton);
-    
     // Actualizar vista del carrito
     this.actualizarCarrito();
-    
-    // Mostrar mensaje de éxito
-    this.mostrarAlerta(`${producto.nombre} agregado al pedido`, 'success');
   }
 
   /**
-   * Verifica si un producto está en el carrito
-   * @param {string} id - ID del producto
-   * @returns {boolean}
+   * Incrementa la cantidad de un producto
    */
-  productoEnCarrito(id) {
-    return this.carrito.some(p => p.id === id);
+  incrementarCantidad(id) {
+    const item = this.carrito.find(p => p.id === id);
+    if (item) {
+      item.cantidad++;
+      this.actualizarCarrito();
+    }
   }
 
   /**
-   * Deshabilita el botón de agregar producto
-   * @param {HTMLElement} boton - Botón a deshabilitar
+   * Decrementa la cantidad de un producto
    */
-  deshabilitarBoton(boton) {
-    boton.disabled = true;
-    boton.innerHTML = '<i class="bi bi-check-circle"></i> Agregado';
-    boton.classList.remove('btn-success');
-    boton.classList.add('btn-secondary');
-  }
-
-  /**
-   * Habilita el botón de agregar producto
-   * @param {string} productoId - ID del producto
-   */
-  habilitarBoton(productoId) {
-    const card = document.querySelector(`.producto-card[data-id="${productoId}"]`);
-    if (!card) return;
-
-    const boton = card.querySelector('.agregar-producto');
-    if (!boton) return;
-
-    boton.disabled = false;
-    boton.innerHTML = '<i class="bi bi-plus-circle"></i> Agregar';
-    boton.classList.remove('btn-secondary');
-    boton.classList.add('btn-success');
+  decrementarCantidad(id) {
+    const item = this.carrito.find(p => p.id === id);
+    if (item) {
+      if (item.cantidad > 1) {
+        item.cantidad--;
+      } else {
+        // Si cantidad es 1, eliminar el producto
+        this.eliminarProducto(id);
+        return;
+      }
+      this.actualizarCarrito();
+    }
   }
 
   /**
    * Elimina un producto del carrito
-   * @param {string} id - ID del producto a eliminar
    */
   eliminarProducto(id) {
     const index = this.carrito.findIndex(p => p.id === id);
@@ -149,18 +134,10 @@ class CarritoCompras {
     }
 
     const productoEliminado = this.carrito[index];
-    
-    // Eliminar del array
     this.carrito.splice(index, 1);
     
-    // Re-habilitar botón de agregar
-    this.habilitarBoton(id);
-    
-    // Actualizar vista del carrito
     this.actualizarCarrito();
-    
-    // Mostrar mensaje
-    this.mostrarAlerta(`${productoEliminado.nombre} eliminado del pedido`, 'info');
+    this.mostrarAlerta(`${productoEliminado.nombre} eliminado`, 'info');
   }
 
   /**
@@ -193,25 +170,55 @@ class CarritoCompras {
   }
 
   /**
-   * Muestra los productos en el carrito
+   * Muestra los productos en el carrito con controles de cantidad
    */
   mostrarProductosCarrito() {
     let html = '';
 
     this.carrito.forEach(producto => {
+      const subtotalItem = producto.precio * producto.cantidad;
       html += `
         <div class="producto-carrito-item d-flex justify-content-between align-items-center mb-2 p-2 border-bottom">
           <div class="flex-grow-1">
             <small class="fw-bold d-block">${this.escaparHTML(producto.nombre)}</small>
-            <small class="text-success">${this.formatearMoneda(producto.precio)}</small>
+            <small class="text-success">${this.formatearMoneda(producto.precio)} c/u</small>
           </div>
-          <button 
-            type="button"
-            class="btn btn-sm btn-outline-danger" 
-            onclick="carritoInstance.eliminarProducto('${producto.id}')"
-            title="Eliminar producto">
-            <i class="bi bi-trash"></i>
-          </button>
+          <div class="d-flex align-items-center gap-2">
+            <!-- Controles de cantidad -->
+            <div class="btn-group btn-group-sm" role="group">
+              <button 
+                type="button"
+                class="btn btn-outline-secondary" 
+                onclick="carritoInstance.decrementarCantidad('${producto.id}')"
+                title="Disminuir cantidad">
+                <i class="bi bi-dash"></i>
+              </button>
+              <button type="button" class="btn btn-outline-secondary" disabled>
+                ${producto.cantidad}
+              </button>
+              <button 
+                type="button"
+                class="btn btn-outline-secondary" 
+                onclick="carritoInstance.incrementarCantidad('${producto.id}')"
+                title="Aumentar cantidad">
+                <i class="bi bi-plus"></i>
+              </button>
+            </div>
+            
+            <!-- Subtotal del item -->
+            <span class="text-success fw-bold" style="min-width: 80px; text-align: right;">
+              ${this.formatearMoneda(subtotalItem)}
+            </span>
+            
+            <!-- Botón eliminar -->
+            <button 
+              type="button"
+              class="btn btn-sm btn-outline-danger" 
+              onclick="carritoInstance.eliminarProducto('${producto.id}')"
+              title="Eliminar producto">
+              <i class="bi bi-trash"></i>
+            </button>
+          </div>
         </div>
       `;
     });
@@ -220,7 +227,7 @@ class CarritoCompras {
   }
 
   /**
-   * Actualiza el resumen del carrito (subtotal)
+   * Actualiza el resumen del carrito
    */
   actualizarResumen() {
     const subtotal = this.calcularSubtotal();
@@ -229,26 +236,40 @@ class CarritoCompras {
   }
 
   /**
-   * Habilita el botón de continuar y actualiza los IDs de productos
+   * Habilita el botón de continuar y actualiza los IDs
    */
   habilitarContinuar() {
     this.elementos.btnContinuar.disabled = false;
-    const productosIds = this.carrito.map(p => p.id);
+    
+    // Crear array con IDs repetidos según cantidad
+    const productosIds = [];
+    this.carrito.forEach(item => {
+      for (let i = 0; i < item.cantidad; i++) {
+        productosIds.push(item.id);
+      }
+    });
+    
     this.elementos.productosIdsInput.value = JSON.stringify(productosIds);
   }
 
   /**
    * Calcula el subtotal del carrito
-   * @returns {number}
    */
   calcularSubtotal() {
-    return this.carrito.reduce((sum, producto) => sum + producto.precio, 0);
+    return this.carrito.reduce((sum, item) => {
+      return sum + (item.precio * item.cantidad);
+    }, 0);
+  }
+
+  /**
+   * Obtiene la cantidad total de productos
+   */
+  cantidadTotal() {
+    return this.carrito.reduce((sum, item) => sum + item.cantidad, 0);
   }
 
   /**
    * Formatea un número como moneda dominicana
-   * @param {number} amount - Cantidad a formatear
-   * @returns {string}
    */
   formatearMoneda(amount) {
     if (isNaN(amount)) return 'RD$ 0.00';
@@ -256,9 +277,7 @@ class CarritoCompras {
   }
 
   /**
-   * Escapa caracteres HTML para prevenir XSS
-   * @param {string} text - Texto a escapar
-   * @returns {string}
+   * Escapa caracteres HTML
    */
   escaparHTML(text) {
     const div = document.createElement('div');
@@ -268,11 +287,8 @@ class CarritoCompras {
 
   /**
    * Muestra una alerta temporal
-   * @param {string} mensaje - Mensaje a mostrar
-   * @param {string} tipo - Tipo de alerta (success, danger, warning, info)
    */
   mostrarAlerta(mensaje, tipo = 'info') {
-    // Verificar si ya existe un contenedor de alertas
     let alertContainer = document.getElementById('carrito-alertas');
     
     if (!alertContainer) {
@@ -291,44 +307,23 @@ class CarritoCompras {
     alerta.role = 'alert';
     alerta.innerHTML = `
       ${mensaje}
-      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
     `;
 
     alertContainer.appendChild(alerta);
 
-    // Auto-cerrar después de 3 segundos
     setTimeout(() => {
       alerta.classList.remove('show');
       setTimeout(() => alerta.remove(), 150);
-    }, 3000);
-  }
-
-  /**
-   * Obtiene el carrito actual
-   * @returns {Array}
-   */
-  obtenerCarrito() {
-    return [...this.carrito];
+    }, 2000);
   }
 
   /**
    * Vacía el carrito
    */
   vaciarCarrito() {
-    this.carrito.forEach(producto => {
-      this.habilitarBoton(producto.id);
-    });
-    
     this.carrito = [];
     this.actualizarCarrito();
-  }
-
-  /**
-   * Obtiene la cantidad de productos en el carrito
-   * @returns {number}
-   */
-  cantidadProductos() {
-    return this.carrito.length;
   }
 }
 
@@ -343,5 +338,4 @@ if (document.readyState === 'loading') {
   carritoInstance = new CarritoCompras();
 }
 
-// Exponer la instancia globalmente para uso en onclick
 window.carritoInstance = carritoInstance;

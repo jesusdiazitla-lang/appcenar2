@@ -41,14 +41,29 @@
 
             <div class="col-md-6 mb-3">
               <strong><i class="bi bi-calendar"></i> Fecha y Hora:</strong>
-              <p class="mb-0">{{formatDate pedido.fechaHora}}</p>
+              <p class="mb-0">{{formatDate pedido.fechaPedido}}</p>
             </div>
           </div>
 
-          <div class="mb-3">
-            <strong><i class="bi bi-geo-alt"></i> Dirección de Entrega:</strong>
-            <p class="mb-0">{{pedido.direccionEntrega}}</p>
-          </div>
+          <!-- Dirección de Entrega - SOLO si está en proceso -->
+          {{#if (eq pedido.estado "en proceso")}}
+            <div class="mb-3">
+              <strong><i class="bi bi-geo-alt-fill text-danger"></i> Dirección de Entrega:</strong>
+              {{#if pedido.direccion}}
+                <div class="alert alert-info mt-2 mb-0">
+                  <div class="d-flex align-items-start">
+                    <i class="bi bi-map fs-4 me-3"></i>
+                    <div>
+                      <strong class="d-block">{{pedido.direccion.nombre}}</strong>
+                      <p class="mb-0">{{pedido.direccion.descripcion}}</p>
+                    </div>
+                  </div>
+                </div>
+              {{else}}
+                <p class="text-muted mb-0">No disponible</p>
+              {{/if}}
+            </div>
+          {{/if}}
 
           {{#if pedido.delivery}}
             <div class="alert alert-info mb-0">
@@ -79,8 +94,8 @@
           <div class="list-group list-group-flush">
             {{#each pedido.productos}}
               <div class="list-group-item d-flex align-items-center">
-                {{#if this.imagen}}
-                  <img src="{{this.imagen}}" alt="{{this.nombre}}" class="me-3 rounded" style="width: 60px; height: 60px; object-fit: cover;">
+                {{#if this.foto}}
+                  <img src="{{this.foto}}" alt="{{this.nombre}}" class="me-3 rounded" style="width: 60px; height: 60px; object-fit: cover;">
                 {{else}}
                   <div class="me-3 bg-light rounded d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
                     <i class="bi bi-image text-muted"></i>
@@ -88,7 +103,6 @@
                 {{/if}}
                 <div class="flex-grow-1">
                   <h6 class="mb-0">{{this.nombre}}</h6>
-                  <small class="text-muted">{{this.descripcion}}</small>
                 </div>
                 <span class="fw-bold text-success">{{formatCurrency this.precio}}</span>
               </div>
@@ -112,7 +126,7 @@
           </div>
           <div class="d-flex justify-content-between mb-2">
             <span>ITBIS:</span>
-            <strong>{{formatCurrency (subtract pedido.total pedido.subtotal)}}</strong>
+            <strong>{{formatCurrency pedido.itbis}}</strong>
           </div>
           <hr>
           <div class="d-flex justify-content-between">

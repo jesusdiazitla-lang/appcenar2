@@ -27,13 +27,43 @@
         <div class="card-body">
           <div class="mb-3">
             <strong><i class="bi bi-calendar"></i> Fecha y Hora del Pedido:</strong>
-            <p class="mb-0">{{formatDate pedido.fechaHora}}</p>
+            <p class="mb-0">{{formatDate pedido.fechaPedido}}</p>
           </div>
 
+          <!-- Dirección de Entrega - SOLO VISIBLE MIENTRAS ESTÁ EN PROCESO -->
           {{#if (eq pedido.estado "en proceso")}}
-            <div class="alert alert-warning">
-              <i class="bi bi-geo-alt-fill"></i> <strong>Dirección de Entrega:</strong><br>
-              {{pedido.direccionEntrega}}
+            <div class="alert alert-warning border-warning border-3">
+              <div class="d-flex align-items-start">
+                <i class="bi bi-geo-alt-fill fs-1 text-danger me-3"></i>
+                <div class="flex-grow-1">
+                  <h5 class="fw-bold mb-3">
+                    <i class="bi bi-pin-map"></i> Dirección de Entrega:
+                  </h5>
+                  {{#if pedido.direccion}}
+                    <div class="bg-white p-3 rounded border border-dark">
+                      <strong class="d-block fs-5 text-dark mb-2">
+                        <i class="bi bi-house-door"></i> {{pedido.direccion.nombre}}
+                      </strong>
+                      <p class="mb-0 fs-6 text-dark">
+                        <i class="bi bi-signpost"></i> {{pedido.direccion.descripcion}}
+                      </p>
+                    </div>
+                  {{else}}
+                    <div class="bg-white p-3 rounded border border-danger">
+                      <p class="text-danger mb-0">
+                        <i class="bi bi-exclamation-triangle"></i> 
+                        <strong>Dirección no disponible</strong> - Contacta con soporte
+                      </p>
+                    </div>
+                  {{/if}}
+                </div>
+              </div>
+            </div>
+          {{else}}
+            <!-- Mensaje cuando el pedido está completado -->
+            <div class="alert alert-success">
+              <i class="bi bi-shield-check"></i> <strong>Privacidad protegida:</strong> 
+              La dirección del cliente ya no es visible una vez completada la entrega.
             </div>
           {{/if}}
 
@@ -59,8 +89,8 @@
           <div class="list-group list-group-flush">
             {{#each pedido.productos}}
               <div class="list-group-item d-flex align-items-center">
-                {{#if this.imagen}}
-                  <img src="{{this.imagen}}" alt="{{this.nombre}}" class="me-3 rounded" style="width: 60px; height: 60px; object-fit: cover;">
+                {{#if this.foto}}
+                  <img src="{{this.foto}}" alt="{{this.nombre}}" class="me-3 rounded" style="width: 60px; height: 60px; object-fit: cover;">
                 {{else}}
                   <div class="me-3 bg-light rounded d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
                     <i class="bi bi-image text-muted"></i>
@@ -68,7 +98,6 @@
                 {{/if}}
                 <div class="flex-grow-1">
                   <h6 class="mb-0">{{this.nombre}}</h6>
-                  <small class="text-muted">{{this.descripcion}}</small>
                 </div>
                 <span class="fw-bold text-success">{{formatCurrency this.precio}}</span>
               </div>
@@ -92,7 +121,7 @@
           </div>
           <div class="d-flex justify-content-between mb-2">
             <span>ITBIS:</span>
-            <strong>{{formatCurrency (subtract pedido.total pedido.subtotal)}}</strong>
+            <strong>{{formatCurrency pedido.itbis}}</strong>
           </div>
           <hr>
           <div class="d-flex justify-content-between">

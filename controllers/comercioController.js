@@ -28,18 +28,24 @@ exports.mostrarDetallePedido = async (req, res) => {
   try {
     const { pedidoId } = req.params;
     const pedido = await Pedido.findById(pedidoId)
-      .populate('cliente')
-      .populate('productos')
-      .populate('delivery');
+      .populate('comercio')
+      .populate('productos.producto')
+      .populate('direccion')  // ✅ AGREGADO: Populate de la dirección
+      .populate('cliente');
 
-    res.render('comercio/pedido-detalle', {
-      layout: 'layouts/comercio',
+    if (!pedido) {
+      req.flash('error', 'Pedido no encontrado');
+      return res.redirect('/delivery/home');
+    }
+
+    res.render('delivery/pedido-detalle', {
+      layout: 'layouts/delivery',
       pedido
     });
   } catch (error) {
     console.error(error);
     req.flash('error', 'Error al cargar detalle del pedido');
-    res.redirect('/comercio/home');
+    res.redirect('/delivery/home');
   }
 };
 
@@ -48,6 +54,8 @@ exports.asignarDelivery = async (req, res) => {
   try {
     const { pedidoId } = req.params;
 
+    console.log('🔍 Buscando delivery disponible para pedido:', pedidoId);
+
     // Buscar delivery disponible
     const deliveryDisponible = await Usuario.findOne({
       rol: 'delivery',
@@ -55,10 +63,15 @@ exports.asignarDelivery = async (req, res) => {
       activo: true
     });
 
+    console.log('📦 Delivery encontrado:', deliveryDisponible ? deliveryDisponible._id : 'NINGUNO');
+
     if (!deliveryDisponible) {
+      console.log('❌ No hay deliveries disponibles');
       req.flash('error', 'No hay delivery disponible en este momento. Intente más tarde.');
       return res.redirect(`/comercio/pedido/${pedidoId}`);
     }
+
+    console.log('✅ Asignando delivery:', deliveryDisponible.nombre, deliveryDisponible.apellido);
 
     // Actualizar pedido
     await Pedido.findByIdAndUpdate(pedidoId, {
@@ -66,15 +79,19 @@ exports.asignarDelivery = async (req, res) => {
       estado: 'en proceso'
     });
 
+    console.log('✅ Pedido actualizado a "en proceso"');
+
     // Marcar delivery como ocupado
     await Usuario.findByIdAndUpdate(deliveryDisponible._id, {
       estadoDisponibilidad: 'ocupado'
     });
 
+    console.log('✅ Delivery marcado como ocupado');
+
     req.flash('success', 'Delivery asignado exitosamente');
     res.redirect(`/comercio/pedido/${pedidoId}`);
   } catch (error) {
-    console.error(error);
+    console.error('❌ Error al asignar delivery:', error);
     req.flash('error', 'Error al asignar delivery');
     res.redirect('/comercio/home');
   }

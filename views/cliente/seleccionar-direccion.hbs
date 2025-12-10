@@ -37,9 +37,12 @@
               {{/each}}
 
               <div class="d-grid gap-2 mt-4">
-                <a href="/cliente/direcciones/crear" class="btn btn-outline-success">
+                <a href="/cliente/direcciones/crear?redirect=back" class="btn btn-outline-success">
                   <i class="bi bi-plus-circle"></i> Agregar Nueva Dirección
                 </a>
+                <small class="text-muted text-center">
+                  <i class="bi bi-info-circle"></i> Tu carrito se guardará por 1 hora
+                </small>
               </div>
             </form>
           {{else}}

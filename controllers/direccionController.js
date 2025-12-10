@@ -18,15 +18,18 @@ exports.listar = async (req, res) => {
 
 // Mostrar formulario de crear dirección
 exports.mostrarCrear = (req, res) => {
+  const redirect = req.query.redirect || null;
+  
   res.render('cliente/direcciones/crear', {
-    layout: 'layouts/cliente'
+    layout: 'layouts/cliente',
+    redirect
   });
 };
 
 // Crear dirección
 exports.crear = async (req, res) => {
   try {
-    const { nombre, descripcion } = req.body;
+    const { nombre, descripcion, redirect } = req.body;
 
     const nuevaDireccion = new Direccion({
       nombre,
@@ -36,6 +39,13 @@ exports.crear = async (req, res) => {
 
     await nuevaDireccion.save();
     req.flash('success', 'Dirección creada exitosamente');
+    
+    // Redirigir según el parámetro redirect
+    if (redirect === 'back') {
+      // Volver a la página anterior (probablemente seleccionar-direccion)
+      return res.redirect('back');
+    }
+    
     res.redirect('/cliente/direcciones');
   } catch (error) {
     console.error(error);
