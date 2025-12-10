@@ -21,7 +21,7 @@ exports.mostrarHome = async (req, res) => {
   }
 };
 
-// Listar comercios por tipo - FUNCIÓN ACTUALIZADA ✨
+// Listar comercios por tipo
 exports.listarComercios = async (req, res) => {
   try {
     const { tipoId } = req.params;
@@ -40,7 +40,7 @@ exports.listarComercios = async (req, res) => {
     const favoritos = await Favorito.find({ cliente: req.session.user.id });
     const favoritosIds = favoritos.map(f => f.comercio.toString());
 
-    // 🆕 Obtener imagen destacada de cada comercio
+    // Obtener imagen destacada de cada comercio
     const comerciosConImagen = await Promise.all(
       comercios.map(async (comercio) => {
         const productoDestacado = await Producto.findOne({ comercio: comercio._id }).limit(1);
@@ -51,14 +51,9 @@ exports.listarComercios = async (req, res) => {
       })
     );
 
-    console.log('📋 Debug listarComercios:');
-    console.log('   - Total comercios:', comercios.length);
-    console.log('   - Total favoritos:', favoritos.length);
-    console.log('   - IDs de favoritos:', favoritosIds);
-
     res.render('cliente/comercios', {
       layout: 'layouts/cliente',
-      comercios: comerciosConImagen, // 🆕 Usar comerciosConImagen
+      comercios: comerciosConImagen,
       tipoComercio,
       cantidadComercios: comercios.length,
       favoritosIds,
@@ -104,10 +99,8 @@ exports.mostrarCatalogo = async (req, res) => {
 };
 
 // ==========================================
-// ARCHIVO: controllers/clienteController.js
-// MODIFICAR LA FUNCIÓN: seleccionarDireccion
+// FUNCIÓN CRÍTICA CORREGIDA: seleccionarDireccion
 // ==========================================
-
 exports.seleccionarDireccion = async (req, res) => {
   try {
     const { comercioId, productosIds } = req.body;
@@ -139,7 +132,7 @@ exports.seleccionarDireccion = async (req, res) => {
       return res.redirect(`/cliente/catalogo/${comercioId}`);
     }
 
-    // 🆕 GUARDAR CARRITO EN SESIÓN
+    // Guardar carrito en sesión
     req.session.carritoTemporal = {
       comercioId,
       productosIds: idsArray,
@@ -150,15 +143,28 @@ exports.seleccionarDireccion = async (req, res) => {
 
     const direcciones = await Direccion.find({ cliente: req.session.user.id });
     const comercio = await Usuario.findById(comercioId);
-    const productos = await Producto.find({ _id: { $in: idsArray } });
+
+    // ✅ CORRECCIÓN CRÍTICA: Obtener IDs únicos y contar cantidades
+    const productosUnicos = [...new Set(idsArray)];
+    const productos = await Producto.find({ _id: { $in: productosUnicos } });
 
     if (productos.length === 0) {
       req.flash('error', 'No se encontraron los productos seleccionados');
       return res.redirect(`/cliente/catalogo/${comercioId}`);
     }
 
-    // Calcular subtotal
-    const subtotal = productos.reduce((sum, prod) => sum + prod.precio, 0);
+    // ✅ Contar cantidades y agregar al producto
+    const productosConCantidad = productos.map(producto => {
+      const cantidad = idsArray.filter(id => id === producto._id.toString()).length;
+      return {
+        ...producto.toObject(),
+        cantidad,
+        subtotalItem: producto.precio * cantidad
+      };
+    });
+
+    // Calcular subtotal REAL con cantidades
+    const subtotal = productosConCantidad.reduce((sum, prod) => sum + prod.subtotalItem, 0);
 
     // Obtener ITBIS de configuración
     const configuracion = await Configuracion.findOne();
@@ -166,11 +172,18 @@ exports.seleccionarDireccion = async (req, res) => {
     const valorItbis = (subtotal * itbis) / 100;
     const total = subtotal + valorItbis;
 
+    console.log('📊 Resumen del pedido:');
+    console.log('   - Productos únicos:', productosConCantidad.length);
+    console.log('   - Total items:', idsArray.length);
+    console.log('   - Subtotal:', subtotal.toFixed(2));
+    console.log('   - ITBIS:', valorItbis.toFixed(2));
+    console.log('   - Total:', total.toFixed(2));
+
     res.render('cliente/seleccionar-direccion', {
       layout: 'layouts/cliente',
       direcciones,
       comercio,
-      productos,
+      productos: productosConCantidad, // ✅ Enviar productos con cantidad
       subtotal: subtotal.toFixed(2),
       itbis,
       valorItbis: valorItbis.toFixed(2),
@@ -185,9 +198,8 @@ exports.seleccionarDireccion = async (req, res) => {
 };
 
 // ==========================================
-// AGREGAR NUEVA FUNCIÓN: restaurarCarrito
+// Restaurar carrito desde sesión
 // ==========================================
-
 exports.restaurarCarrito = async (req, res) => {
   try {
     // Verificar si hay un carrito en sesión
@@ -203,13 +215,11 @@ exports.restaurarCarrito = async (req, res) => {
     console.log('   - Productos:', productosIds);
 
     // Redirigir al flujo normal de selección de dirección
-    // Simular el POST original
     req.body = {
       comercioId,
       productosIds: JSON.stringify(productosIds)
     };
 
-    // Llamar a seleccionarDireccion
     return exports.seleccionarDireccion(req, res);
   } catch (error) {
     console.error('❌ Error al restaurar carrito:', error);
@@ -219,9 +229,8 @@ exports.restaurarCarrito = async (req, res) => {
 };
 
 // ==========================================
-// MODIFICAR LA FUNCIÓN: crearPedido
+// FUNCIÓN CRÍTICA CORREGIDA: crearPedido
 // ==========================================
-
 exports.crearPedido = async (req, res) => {
   try {
     console.log('='.repeat(50));
@@ -244,6 +253,7 @@ exports.crearPedido = async (req, res) => {
     try {
       idsArray = JSON.parse(productosIds);
       console.log('✅ productosIds parseado:', idsArray);
+      console.log('   - Total items en el pedido:', idsArray.length);
     } catch (e) {
       console.error('❌ Error al parsear productosIds:', e);
       req.flash('error', 'Error al procesar los productos');
@@ -256,12 +266,16 @@ exports.crearPedido = async (req, res) => {
       return res.redirect('/cliente/home');
     }
 
-    // Buscar productos
-    const productos = await Producto.find({ _id: { $in: idsArray } });
+    // ✅ CORRECCIÓN CRÍTICA: Obtener productos únicos
+    const productosUnicos = [...new Set(idsArray)];
+    const productos = await Producto.find({ _id: { $in: productosUnicos } });
+    
     if (productos.length === 0) {
       req.flash('error', 'No se encontraron los productos');
       return res.redirect('/cliente/home');
     }
+
+    console.log('✅ Productos únicos encontrados:', productos.length);
 
     // Buscar dirección
     const direccion = await Direccion.findById(direccionId);
@@ -277,20 +291,40 @@ exports.crearPedido = async (req, res) => {
       return res.redirect('/cliente/home');
     }
 
-    // Calcular valores
-    const subtotal = productos.reduce((sum, prod) => sum + prod.precio, 0);
+    // ✅ Calcular valores con cantidades
+    let subtotal = 0;
+    const productosSnapshot = [];
+
+    productos.forEach(producto => {
+      // Contar cuántas veces aparece este producto en el array
+      const cantidad = idsArray.filter(id => id === producto._id.toString()).length;
+      const subtotalItem = producto.precio * cantidad;
+      
+      console.log(`   - ${producto.nombre}: ${cantidad}x @ ${producto.precio} = ${subtotalItem}`);
+      
+      subtotal += subtotalItem;
+
+      // ✅ Agregar cada unidad como un item separado en el snapshot
+      for (let i = 0; i < cantidad; i++) {
+        productosSnapshot.push({
+          producto: producto._id,
+          nombre: producto.nombre,
+          precio: producto.precio,
+          foto: producto.imagen
+        });
+      }
+    });
+
     const configuracion = await Configuracion.findOne();
     const itbis = configuracion ? configuracion.itbis : 18;
     const valorItbis = (subtotal * itbis) / 100;
     const total = subtotal + valorItbis;
 
-    // Preparar productos con snapshot
-    const productosSnapshot = productos.map(p => ({
-      producto: p._id,
-      nombre: p.nombre,
-      precio: p.precio,
-      foto: p.imagen
-    }));
+    console.log('📊 Cálculos finales:');
+    console.log('   - Subtotal:', subtotal.toFixed(2));
+    console.log('   - ITBIS (' + itbis + '%):', valorItbis.toFixed(2));
+    console.log('   - Total:', total.toFixed(2));
+    console.log('   - Items en snapshot:', productosSnapshot.length);
 
     // Crear pedido
     const pedidoData = {
@@ -298,7 +332,7 @@ exports.crearPedido = async (req, res) => {
       comercio: comercioId,
       delivery: null,
       direccion: direccionId,
-      productos: productosSnapshot,
+      productos: productosSnapshot, // ✅ Ahora incluye todas las unidades
       subtotal: subtotal,
       itbis: valorItbis,
       total: total,
@@ -310,8 +344,9 @@ exports.crearPedido = async (req, res) => {
     const pedidoGuardado = await nuevoPedido.save();
     
     console.log('✅ PEDIDO CREADO:', pedidoGuardado._id);
+    console.log('   - Total de productos guardados:', pedidoGuardado.productos.length);
 
-    // 🆕 LIMPIAR CARRITO TEMPORAL DE LA SESIÓN
+    // Limpiar carrito temporal de la sesión
     if (req.session.carritoTemporal) {
       delete req.session.carritoTemporal;
       console.log('🧹 Carrito temporal eliminado de la sesión');
@@ -369,7 +404,7 @@ exports.listarPedidos = async (req, res) => {
     const pedidos = await Pedido.find({ cliente: req.session.user.id })
       .populate('comercio')
       .populate('productos')
-      .sort({ fechaHora: -1 });
+      .sort({ fechaPedido: -1 });
 
     res.render('cliente/pedidos', {
       layout: 'layouts/cliente',
@@ -388,7 +423,8 @@ exports.mostrarDetallePedido = async (req, res) => {
     const { pedidoId } = req.params;
     const pedido = await Pedido.findById(pedidoId)
       .populate('comercio')
-      .populate('productos');
+      .populate('direccion')
+      .populate('productos.producto');
 
     res.render('cliente/pedido-detalle', {
       layout: 'layouts/cliente',
