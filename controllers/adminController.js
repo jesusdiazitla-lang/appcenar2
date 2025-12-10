@@ -249,25 +249,26 @@ exports.crearAdministrador = async (req, res) => {
       return res.redirect('/admin/administradores/crear');
     }
 
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
-
+    // ✅ NO hashear manualmente - el hook pre('save') lo hace automáticamente
     const nuevoAdmin = new Usuario({
       nombre,
       apellido,
       cedula,
       correo,
       nombreUsuario,
-      password: hashedPassword,
+      password: password, // ✅ Password sin hashear - el modelo lo hashea
       rol: 'administrador',
       activo: true
     });
 
     await nuevoAdmin.save();
+    
+    console.log('✅ Nuevo administrador creado:', nuevoAdmin.nombreUsuario);
+    
     req.flash('success', 'Administrador creado exitosamente');
     res.redirect('/admin/administradores');
   } catch (error) {
-    console.error(error);
+    console.error('❌ Error al crear administrador:', error);
     req.flash('error', 'Error al crear administrador');
     res.redirect('/admin/administradores/crear');
   }
