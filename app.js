@@ -80,15 +80,31 @@ app.use(cookieParser(process.env.COOKIE_SECRET));
 
 // ========== CONFIGURACIÓN DE SESIONES ==========
 if (!PREVIEW) {
+  // ✅ Determinar la URL de MongoDB según el entorno
+  const mongoUrl = process.env.NODE_ENV === 'production' 
+    ? process.env.MONGODB_URI  // Railway/Producción
+    : process.env.NODE_ENV === 'qa' 
+      ? process.env.QA_MONGODB_URI 
+      : process.env.DEV_MONGODB_URI;
+
+  console.log('🔍 Configuración de sesión:');
+  console.log('   - Entorno:', process.env.NODE_ENV || 'development');
+  console.log('   - MongoDB URL:', mongoUrl ? '✅ Configurada' : '❌ No encontrada');
+
+  if (!mongoUrl) {
+    console.error('❌ ERROR: No se encontró MONGODB_URI en las variables de entorno');
+    console.error('   Variables disponibles:', Object.keys(process.env).filter(k => k.includes('MONGO')));
+    process.exit(1);
+  }
+
   app.use(session({
-    secret: process.env.SESSION_SECRET,
+    secret: process.env.SESSION_SECRET || 'fallback-secret-key-change-in-production',
     resave: false,
     saveUninitialized: false,
     store: MongoStore.create({
-      mongoUrl: process.env.NODE_ENV === 'qa'
-        ? process.env.QA_MONGODB_URI
-        : process.env.DEV_MONGODB_URI,
-      touchAfter: 24 * 3600
+      mongoUrl: mongoUrl,
+      touchAfter: 24 * 3600,
+      ttl: 7 * 24 * 60 * 60 // 7 días
     }),
     cookie: {
       maxAge: 1000 * 60 * 60 * 24 * 7,
@@ -97,6 +113,8 @@ if (!PREVIEW) {
       sameSite: 'lax'
     }
   }));
+
+  console.log('✅ Sesiones configuradas con MongoDB Store');
 } else {
   app.use(session({
     secret: 'preview-secret',
