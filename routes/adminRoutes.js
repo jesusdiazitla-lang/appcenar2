@@ -10,11 +10,15 @@ const upload = require('../config/multer');
 
 // Aplicar middleware de autenticación y rol a todas las rutas
 router.use(auth.isAuthenticated);
-router.use(checkRole('administrador')); // ✅ CORREGIDO - ahora verifica rol de administrador
+router.use(checkRole('administrador'));
 router.use(checkActiveAccount);
 
 // Dashboard principal
 router.get('/dashboard', adminController.mostrarDashboard);
+
+// ✅ NUEVO: Rutas para cambiar contraseña
+router.get('/cambiar-password', adminController.mostrarCambiarPassword);
+router.post('/cambiar-password', adminController.cambiarPassword);
 
 // Gestión de Clientes
 router.get('/clientes', adminController.listarClientes);

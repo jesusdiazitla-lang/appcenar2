@@ -348,3 +348,74 @@ exports.toggleActivoAdministrador = async (req, res) => {
     res.redirect('/admin/administradores');
   }
 };
+
+// ✅ NUEVO: Mostrar formulario de cambio de contraseña
+exports.mostrarCambiarPassword = (req, res) => {
+  const requiereCambio = req.session.user.requiereCambioPassword || false;
+  
+  res.render('admin/cambiar-password', {
+    layout: 'layouts/admin',
+    requiereCambio
+  });
+};
+
+// ✅ NUEVO: Procesar cambio de contraseña
+exports.cambiarPassword = async (req, res) => {
+  try {
+    const { passwordActual, passwordNuevo, confirmarPassword } = req.body;
+
+    console.log('🔐 Cambio de contraseña para admin:', req.session.user.id);
+
+    // Validar que las nuevas contraseñas coincidan
+    if (passwordNuevo !== confirmarPassword) {
+      req.flash('error', 'Las contraseñas nuevas no coinciden');
+      return res.redirect('/admin/cambiar-password');
+    }
+
+    // Validar longitud mínima
+    if (passwordNuevo.length < 6) {
+      req.flash('error', 'La nueva contraseña debe tener al menos 6 caracteres');
+      return res.redirect('/admin/cambiar-password');
+    }
+
+    // Buscar usuario con contraseña
+    const admin = await Usuario.findById(req.session.user.id).select('+password');
+
+    if (!admin) {
+      req.flash('error', 'Usuario no encontrado');
+      return res.redirect('/admin/cambiar-password');
+    }
+
+    // Verificar contraseña actual
+    const passwordValido = await admin.compararPassword(passwordActual);
+
+    if (!passwordValido) {
+      req.flash('error', 'La contraseña actual es incorrecta');
+      return res.redirect('/admin/cambiar-password');
+    }
+
+    // Actualizar contraseña y quitar flag de requerimiento
+    admin.password = passwordNuevo;
+    admin.requiereCambioPassword = false;
+    await admin.save();
+
+    console.log('✅ Contraseña actualizada exitosamente');
+
+    // Actualizar sesión
+    req.session.user.requiereCambioPassword = false;
+
+    req.session.save((err) => {
+      if (err) {
+        console.error('Error al guardar sesión:', err);
+      }
+      
+      req.flash('success', 'Contraseña actualizada exitosamente');
+      res.redirect('/admin/dashboard');
+    });
+
+  } catch (error) {
+    console.error('❌ Error al cambiar contraseña:', error);
+    req.flash('error', 'Error al cambiar contraseña');
+    res.redirect('/admin/cambiar-password');
+  }
+};

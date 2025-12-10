@@ -28,13 +28,17 @@ const usuarioSchema = new mongoose.Schema({
     type: String,
     default: null
   },
-  tokenRecuperacion: {
+  tokenResetPassword: {  // ✅ Para recuperación de contraseña
     type: String,
     default: null
   },
-  tokenExpiracion: {
+  tokenExpiracion: {  // ✅ Fecha de expiración del token de reset
     type: Date,
     default: null
+  },
+  requiereCambioPassword: {  // ✅ Para forzar cambio de contraseña
+    type: Boolean,
+    default: false
   },
 
   // Campos para cliente, delivery, y administrador

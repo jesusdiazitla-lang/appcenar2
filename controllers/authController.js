@@ -48,19 +48,13 @@ exports.mostrarRegistroComercio = async (req, res) => {
   }
 };
 
-// ======================================================
-// 🔑 PROCESAR LOGIN - CORREGIDO
-// ======================================================
-// Extracto de controllers/authController.js
-// Solo la función login corregida
-
+// Procesar LOGIN
 exports.login = async (req, res) => {
   try {
     console.log('=== INICIO LOGIN ===');
     const { usuarioOrEmail, password } = req.body;
     console.log('Usuario/Email ingresado:', usuarioOrEmail);
 
-    // Buscar usuario, forzando la inclusión del hash de contraseña.
     const usuario = await Usuario.findOne({
       $or: [{ nombreUsuario: usuarioOrEmail }, { correo: usuarioOrEmail }]
     }).select('+password');
@@ -72,7 +66,6 @@ exports.login = async (req, res) => {
       return res.redirect('/auth/login');
     }
 
-    // Verificar si la cuenta está activa
     if (!usuario.activo) {
       req.flash('error', 'Su cuenta está inactiva. Revise su correo para activarla.');
       return res.redirect('/auth/login');
@@ -80,7 +73,6 @@ exports.login = async (req, res) => {
 
     console.log('Password hash en DB:', usuario.password);
 
-    // Verificar contraseña usando el método del modelo
     const passwordValido = await usuario.compararPassword(password);
     console.log('Password válido:', passwordValido);
 
@@ -89,30 +81,33 @@ exports.login = async (req, res) => {
       return res.redirect('/auth/login');
     }
 
-    // Crear sesión
     req.session.user = {
-      id: usuario._id.toString(), // ✅ Convertir a string
+      id: usuario._id.toString(),
       rol: usuario.rol,
       nombre: usuario.nombre || usuario.nombreComercio,
       correo: usuario.correo,
-      activo: usuario.activo // ✅ Agregar estado activo
+      activo: usuario.activo,
+      requiereCambioPassword: usuario.requiereCambioPassword || false
     };
 
     console.log('Sesión creada:', req.session.user);
 
-    // Guardar la sesión explícitamente antes de redirigir
     req.session.save((err) => {
-        if (err) {
-            console.error('❌ Error al guardar sesión después del login:', err);
-            req.flash('error', 'Error interno al establecer la sesión.');
-            return res.redirect('/auth/login');
-        }
-        
-        console.log('✅ Sesión guardada exitosamente');
-        console.log('=== FIN LOGIN ===');
-        
-        // Redirigir según rol SOLO después de que la sesión se haya guardado
-        res.redirect(getRoleHome(usuario.rol));
+      if (err) {
+        console.error('❌ Error al guardar sesión:', err);
+        req.flash('error', 'Error interno al establecer la sesión.');
+        return res.redirect('/auth/login');
+      }
+      
+      console.log('✅ Sesión guardada exitosamente');
+      console.log('=== FIN LOGIN ===');
+      
+      // ✅ Si es admin y requiere cambio de password, redirigir a cambiar contraseña
+      if (usuario.rol === 'administrador' && usuario.requiereCambioPassword) {
+        return res.redirect('/admin/cambiar-password');
+      }
+      
+      res.redirect(getRoleHome(usuario.rol));
     });
 
   } catch (error) {
@@ -122,25 +117,7 @@ exports.login = async (req, res) => {
   }
 };
 
-// Función auxiliar para obtener home según rol
-function getRoleHome(rol) {
-  switch(rol) {
-    case 'cliente':
-      return '/cliente/home';
-    case 'comercio':
-      return '/comercio/home';
-    case 'delivery':
-      return '/delivery/home';
-    case 'administrador':
-      return '/admin/dashboard';
-    default:
-      return '/auth/login';
-  }
-}
-
-// ======================================================
-// 📝 REGISTRAR CLIENTE/DELIVERY - DEJANDO QUE EL HOOK HASHEE
-// ======================================================
+// Registrar cliente/delivery
 exports.registrarCliente = async (req, res) => {
   try {
     const { nombre, apellido, telefono, correo, nombreUsuario, rol, password, confirmarPassword } = req.body;
@@ -161,7 +138,6 @@ exports.registrarCliente = async (req, res) => {
 
     const tokenActivacion = crypto.randomBytes(32).toString('hex');
 
-    // ⚠️ ENVIAR PASSWORD EN TEXTO PLANO - EL HOOK SE ENCARGA
     const nuevoUsuario = new Usuario({
       nombre,
       apellido,
@@ -169,14 +145,14 @@ exports.registrarCliente = async (req, res) => {
       correo,
       nombreUsuario,
       rol,
-      password: password, // ← Texto plano, el hook lo hashea
+      password: password,
       activo: false,
       tokenActivacion,
       fotoPerfil: req.file ? `/uploads/${req.file.filename}` : null,
       estadoDisponibilidad: rol === 'delivery' ? 'disponible' : undefined
     });
 
-    await nuevoUsuario.save(); // ← Aquí se ejecuta el hook pre('save')
+    await nuevoUsuario.save();
 
     const urlActivacion = `${req.protocol}://${req.get('host')}/auth/activar/${tokenActivacion}`;
     await EmailService.enviarCorreoActivacion(correo, nombre, urlActivacion);
@@ -191,9 +167,7 @@ exports.registrarCliente = async (req, res) => {
   }
 };
 
-// ======================================================
-// 🏪 REGISTRAR COMERCIO - TAMBIÉN CON HOOK
-// ======================================================
+// Registrar comercio
 exports.registrarComercio = async (req, res) => {
   try {
     const { nombreComercio, telefono, correo, horaApertura, horaCierre, tipoComercio, password, confirmarPassword } = req.body;
@@ -212,7 +186,6 @@ exports.registrarComercio = async (req, res) => {
 
     const tokenActivacion = crypto.randomBytes(32).toString('hex');
 
-    // ⚠️ TAMBIÉN EN TEXTO PLANO - CONSISTENCIA
     const nuevoComercio = new Usuario({
       nombreComercio,
       telefono,
@@ -221,7 +194,7 @@ exports.registrarComercio = async (req, res) => {
       horaCierre,
       tipoComercio,
       rol: 'comercio',
-      password: password, // ← El hook lo hashea
+      password: password,
       activo: false,
       tokenActivacion,
       logoComercio: req.file ? `/uploads/${req.file.filename}` : null
@@ -273,10 +246,12 @@ exports.mostrarRecuperarPassword = (req, res) => {
   res.render('auth/forgot-password', { layout: 'layouts/public' });
 };
 
-// Procesar recuperar contraseña
+// ✅ CORREGIDO: Procesar recuperar contraseña
 exports.recuperarPassword = async (req, res) => {
   try {
     const { usuarioOrEmail } = req.body;
+
+    console.log('🔐 Solicitud de recuperación para:', usuarioOrEmail);
 
     const usuario = await Usuario.findOne({
       $or: [{ nombreUsuario: usuarioOrEmail }, { correo: usuarioOrEmail }]
@@ -287,34 +262,60 @@ exports.recuperarPassword = async (req, res) => {
       return res.redirect('/auth/forgot-password');
     }
 
+    // ✅ Generar token y fecha de expiración (1 hora)
     const tokenReset = crypto.randomBytes(32).toString('hex');
+    const expiracion = new Date();
+    expiracion.setHours(expiracion.getHours() + 1);
+
+    console.log('🔑 Token generado:', tokenReset);
+    console.log('⏰ Expira el:', expiracion);
+
+    // ✅ CORRECCIÓN: Usar los nombres correctos de campos
     usuario.tokenResetPassword = tokenReset;
+    usuario.tokenExpiracion = expiracion;
     await usuario.save();
 
+    console.log('✅ Token guardado en BD');
+
     const urlReset = `${req.protocol}://${req.get('host')}/auth/reset-password/${tokenReset}`;
-    await EmailService.enviarCorreoResetPassword(usuario.correo, usuario.nombre || usuario.nombreComercio, urlReset);
+    await EmailService.enviarCorreoResetPassword(
+      usuario.correo, 
+      usuario.nombre || usuario.nombreComercio, 
+      urlReset
+    );
+
+    console.log('📧 Correo enviado a:', usuario.correo);
 
     req.flash('success', 'Se ha enviado un correo con instrucciones para restablecer su contraseña.');
     res.redirect('/auth/forgot-password');
 
   } catch (error) {
-    console.error(error);
+    console.error('❌ Error en recuperarPassword:', error);
     req.flash('error', 'Error al procesar solicitud');
     res.redirect('/auth/forgot-password');
   }
 };
 
-// Mostrar formulario de reset password
+// ✅ CORREGIDO: Mostrar formulario de reset password
 exports.mostrarResetPassword = async (req, res) => {
   try {
     const { token } = req.params;
 
-    const usuario = await Usuario.findOne({ tokenResetPassword: token });
+    console.log('🔍 Verificando token:', token);
+
+    // ✅ Buscar usuario con el token Y que no haya expirado
+    const usuario = await Usuario.findOne({ 
+      tokenResetPassword: token,
+      tokenExpiracion: { $gt: new Date() } // Token no expirado
+    });
 
     if (!usuario) {
-      req.flash('error', 'Token inválido o expirado');
-      return res.redirect('/auth/login');
+      console.log('❌ Token inválido o expirado');
+      req.flash('error', 'El enlace de recuperación es inválido o ha expirado. Solicite uno nuevo.');
+      return res.redirect('/auth/forgot-password');
     }
+
+    console.log('✅ Token válido para:', usuario.correo);
 
     res.render('auth/reset-password', {
       layout: 'layouts/public',
@@ -322,39 +323,51 @@ exports.mostrarResetPassword = async (req, res) => {
     });
 
   } catch (error) {
-    console.error(error);
+    console.error('❌ Error en mostrarResetPassword:', error);
     req.flash('error', 'Error al cargar formulario');
     res.redirect('/auth/login');
   }
 };
 
-// Procesar reset password
+// ✅ CORREGIDO: Procesar reset password
 exports.resetPassword = async (req, res) => {
   try {
     const { token, password, confirmarPassword } = req.body;
+
+    console.log('🔄 Procesando reset de password para token:', token);
 
     if (password !== confirmarPassword) {
       req.flash('error', 'Las contraseñas no coinciden');
       return res.redirect(`/auth/reset-password/${token}`);
     }
 
-    const usuario = await Usuario.findOne({ tokenResetPassword: token });
+    // ✅ Buscar usuario con token válido y no expirado
+    const usuario = await Usuario.findOne({ 
+      tokenResetPassword: token,
+      tokenExpiracion: { $gt: new Date() }
+    });
 
     if (!usuario) {
-      req.flash('error', 'Token inválido o expirado');
-      return res.redirect('/auth/login');
+      console.log('❌ Token inválido o expirado');
+      req.flash('error', 'El enlace de recuperación es inválido o ha expirado. Solicite uno nuevo.');
+      return res.redirect('/auth/forgot-password');
     }
 
-    // ⚠️ TAMBIÉN EN TEXTO PLANO - EL HOOK LO HASHEA
+    console.log('✅ Actualizando contraseña para:', usuario.correo);
+
+    // ✅ Actualizar contraseña y limpiar tokens
     usuario.password = password;
     usuario.tokenResetPassword = null;
-    await usuario.save(); // ← Hook pre('save') hashea la nueva contraseña
+    usuario.tokenExpiracion = null;
+    await usuario.save();
+
+    console.log('✅ Contraseña actualizada exitosamente');
 
     req.flash('success', 'Contraseña actualizada exitosamente. Ya puede iniciar sesión.');
     res.redirect('/auth/login');
 
   } catch (error) {
-    console.error(error);
+    console.error('❌ Error en resetPassword:', error);
     req.flash('error', 'Error al resetear contraseña');
     res.redirect('/auth/login');
   }

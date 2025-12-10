@@ -8,6 +8,7 @@ const MongoStore = require('connect-mongo');
 const flash = require('connect-flash');
 const methodOverride = require('method-override');
 const connectDB = require('./config/database');
+const checkPasswordChange = require('./middleware/checkPasswordChange');  // ✅ NUEVO
 
 const app = express();
 const PORT = process.env.PORT || 8080;
@@ -30,29 +31,15 @@ app.set('views', path.join(__dirname, 'views'));
 hbs.registerPartials(path.join(__dirname, 'views', 'partials'));
 
 // ========== HELPERS DE HANDLEBARS ==========
-
-// Helper para comparación de igualdad
 hbs.registerHelper('eq', (a, b) => a == b);
-
-// Helper para OR lógico
 hbs.registerHelper('or', (a, b) => a || b);
-
-// Helper para AND lógico
 hbs.registerHelper('and', (a, b) => a && b);
-
-// Helper para NOT lógico
 hbs.registerHelper('not', (a) => !a);
-
-// Helper para convertir a JSON
 hbs.registerHelper('json', (context) => JSON.stringify(context));
-
-// ✅ Helper para verificar si un elemento está en un array
 hbs.registerHelper('includes', function(array, value) {
   if (!Array.isArray(array)) return false;
   return array.includes(value.toString());
 });
-
-// Helper para formatear fechas
 hbs.registerHelper('formatDate', function (date) {
   if (!date) return '';
   const d = new Date(date);
@@ -64,32 +51,17 @@ hbs.registerHelper('formatDate', function (date) {
     minute: '2-digit'
   });
 });
-
-// Helper para formatear moneda
 hbs.registerHelper('formatCurrency', (amount) => {
   if (!amount && amount !== 0) return 'RD$ 0.00';
   return `RD$${Number(amount).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}`;
 });
-
-// ✅ Helper para operaciones matemáticas
-hbs.registerHelper('subtract', (a, b) => {
-  return Number(a) - Number(b);
-});
-
-hbs.registerHelper('add', (a, b) => {
-  return Number(a) + Number(b);
-});
-
-hbs.registerHelper('multiply', (a, b) => {
-  return Number(a) * Number(b);
-});
-
+hbs.registerHelper('subtract', (a, b) => Number(a) - Number(b));
+hbs.registerHelper('add', (a, b) => Number(a) + Number(b));
+hbs.registerHelper('multiply', (a, b) => Number(a) * Number(b));
 hbs.registerHelper('divide', (a, b) => {
   if (b === 0) return 0;
   return Number(a) / Number(b);
 });
-
-// ✅ HELPER IMPORTANTE: Convertir ObjectId a String para comparaciones
 hbs.registerHelper('toString', function(value) {
   if (!value) return '';
   return value.toString();
@@ -138,14 +110,12 @@ if (!PREVIEW) {
 app.use(flash());
 
 // ========== VARIABLES GLOBALES PARA VISTAS ==========
-// ✅ IMPORTANTE: Este middleware DEBE ir DESPUÉS de session()
 app.use((req, res, next) => {
   res.locals.success = req.flash('success');
   res.locals.error = req.flash('error');
   res.locals.warning = req.flash('warning');
   res.locals.info = req.flash('info');
 
-  // ✅ Siempre establecer estas variables
   res.locals.currentUser = req.session?.user || null;
   res.locals.isAuthenticated = !!req.session?.user;
 
@@ -155,6 +125,9 @@ app.use((req, res, next) => {
 
   next();
 });
+
+// ✅ NUEVO: Middleware para verificar cambio de contraseña (ANTES de las rutas)
+app.use(checkPasswordChange);
 
 // ========== RUTAS ==========
 const authRoutes = require('./routes/authRoutes');
@@ -168,8 +141,6 @@ app.use('/cliente', clienteRoutes);
 app.use('/comercio', comercioRoutes);
 app.use('/delivery', deliveryRoutes);
 app.use('/admin', adminRoutes);
-
-// ... (resto del código)
 
 // Ruta raíz
 app.get('/', (req, res) => {
@@ -200,7 +171,7 @@ app.use((req, res) => {
 
 // ❗ ERROR 500
 app.use((err, req, res, next) => {
-  console.error(' Error:', err);
+  console.error('❌ Error:', err);
   res.status(err.status || 500).render('errors/500', {
     layout: 'layouts/public',
     title: 'Error del servidor',
@@ -214,7 +185,7 @@ app.use((err, req, res, next) => {
 app.listen(PORT, () => {
   console.log('═══════════════════════════════════════');
   console.log(`  AppCenar corriendo en http://localhost:${PORT}`);
-  console.log(` Entorno: ${process.env.NODE_ENV || 'development'}`);
-  console.log(` Preview Mode: ${PREVIEW}`);
+  console.log(`  Entorno: ${process.env.NODE_ENV || 'development'}`);
+  console.log(`  Preview Mode: ${PREVIEW}`);
   console.log('═══════════════════════════════════════');
 });

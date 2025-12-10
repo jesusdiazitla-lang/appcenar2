@@ -27,7 +27,6 @@ async function crearAdminInicial() {
       console.log(`✅ Estado: ${adminExistente.activo ? 'Activo' : 'Inactivo'}`);
       console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
       
-      // Preguntar si quiere actualizar la contraseña
       console.log('💡 Si quieres resetear la contraseña del admin existente:');
       console.log('   1. Elimina el usuario admin de la base de datos');
       console.log('   2. Vuelve a ejecutar este script\n');
@@ -36,25 +35,26 @@ async function crearAdminInicial() {
       process.exit(0);
     }
 
-    // ⚠️ CRÍTICO: NO HASHEAR AQUÍ - EL HOOK DEL MODELO LO HACE
     console.log('🔐 Creando administrador...');
 
+    // ✅ Crear admin con requiereCambioPassword = true
     const admin = new Usuario({
       nombre: 'Admin',
       apellido: 'Sistema',
       cedula: '00000000000',
       correo: 'admin@appcenar.com',
       nombreUsuario: 'admin',
-      password: 'admin123', // ← En texto plano, el hook pre('save') lo hashea
+      password: 'admin123', // ← Hook pre('save') lo hashea
       rol: 'administrador',
-      activo: true // ← Ya activo, no necesita email de activación
+      activo: true,
+      requiereCambioPassword: true  // ✅ NUEVO: Forzar cambio de contraseña
     });
 
-    await admin.save(); // ← Aquí el hook pre('save') hashea la contraseña
+    await admin.save();
 
     console.log('✅ ¡Administrador creado exitosamente!\n');
     console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-    console.log('📋 CREDENCIALES DE ACCESO:');
+    console.log('📋 CREDENCIALES DE ACCESO TEMPORAL:');
     console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
     console.log('🌐 URL: http://localhost:8080/auth/login');
     console.log('📧 Correo: admin@appcenar.com');
@@ -62,8 +62,9 @@ async function crearAdminInicial() {
     console.log('🔑 Contraseña: admin123');
     console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
     console.log('⚠️  IMPORTANTE:');
-    console.log('   • Cambia esta contraseña después del primer login');
-    console.log('   • Guarda estas credenciales en un lugar seguro');
+    console.log('   • Al iniciar sesión, se te pedirá cambiar la contraseña');
+    console.log('   • No podrás acceder al sistema hasta cambiar la contraseña');
+    console.log('   • Usa una contraseña segura para proteger el sistema');
     console.log('   • Crea tipos de comercio antes de registrar comercios\n');
 
     await mongoose.disconnect();
