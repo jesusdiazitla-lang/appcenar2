@@ -48,35 +48,47 @@ exports.mostrarRegistroComercio = async (req, res) => {
   }
 };
 
-// Procesar LOGIN
+// Procesar LOGIN - ✅ CORRECCIÓN COMPLETA
 exports.login = async (req, res) => {
   try {
     console.log('=== INICIO LOGIN ===');
     const { usuarioOrEmail, password } = req.body;
     console.log('Usuario/Email ingresado:', usuarioOrEmail);
 
+    // ✅ CRÍTICO: Incluir .select('+password') para obtener el hash
     const usuario = await Usuario.findOne({
       $or: [{ nombreUsuario: usuarioOrEmail }, { correo: usuarioOrEmail }]
-    }).select('+password');
+    }).select('+password'); // ⚠️ ESTA LÍNEA ES CRÍTICA
 
     console.log('Usuario encontrado:', usuario?._id);
+    console.log('Password hash disponible:', usuario?.password ? 'Sí' : 'NO - ESTE ES EL PROBLEMA');
 
     if (!usuario) {
+      console.log('❌ Usuario no encontrado');
       req.flash('error', 'Credenciales incorrectas');
       return res.redirect('/auth/login');
     }
 
     if (!usuario.activo) {
+      console.log('❌ Usuario inactivo');
       req.flash('error', 'Su cuenta está inactiva. Revise su correo para activarla.');
       return res.redirect('/auth/login');
     }
 
-    console.log('Password hash en DB:', usuario.password);
+    // ✅ Verificar que el password hash existe
+    if (!usuario.password) {
+      console.error('❌ CRÍTICO: Password hash no disponible para el usuario');
+      req.flash('error', 'Error de configuración de cuenta. Contacte al administrador.');
+      return res.redirect('/auth/login');
+    }
+
+    console.log('Password hash en DB (primeros 20 chars):', usuario.password.substring(0, 20) + '...');
 
     const passwordValido = await usuario.compararPassword(password);
     console.log('Password válido:', passwordValido);
 
     if (!passwordValido) {
+      console.log('❌ Contraseña incorrecta');
       req.flash('error', 'Credenciales incorrectas');
       return res.redirect('/auth/login');
     }
@@ -102,7 +114,7 @@ exports.login = async (req, res) => {
       console.log('✅ Sesión guardada exitosamente');
       console.log('=== FIN LOGIN ===');
       
-      // ✅ Si es admin y requiere cambio de password, redirigir a cambiar contraseña
+      // Si es admin y requiere cambio de password
       if (usuario.rol === 'administrador' && usuario.requiereCambioPassword) {
         return res.redirect('/admin/cambiar-password');
       }
@@ -112,6 +124,7 @@ exports.login = async (req, res) => {
 
   } catch (error) {
     console.error('❌ Error en login:', error);
+    console.error('Stack trace:', error.stack);
     req.flash('error', 'Error al iniciar sesión');
     res.redirect('/auth/login');
   }

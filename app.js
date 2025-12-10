@@ -80,12 +80,8 @@ app.use(cookieParser(process.env.COOKIE_SECRET));
 
 // ========== CONFIGURACIÓN DE SESIONES ==========
 if (!PREVIEW) {
-  // ✅ Determinar la URL de MongoDB según el entorno
-  const mongoUrl = process.env.NODE_ENV === 'production' 
-    ? process.env.MONGODB_URI  // Railway/Producción
-    : process.env.NODE_ENV === 'qa' 
-      ? process.env.QA_MONGODB_URI 
-      : process.env.DEV_MONGODB_URI;
+  // ✅ CORRECCIÓN: Simplificar - usar siempre MONGODB_URI
+  const mongoUrl = process.env.MONGODB_URI;
 
   console.log('🔍 Configuración de sesión:');
   console.log('   - Entorno:', process.env.NODE_ENV || 'development');
@@ -109,7 +105,7 @@ if (!PREVIEW) {
     cookie: {
       maxAge: 1000 * 60 * 60 * 24 * 7,
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+      secure: process.env.NODE_ENV === 'production', // ✅ HTTPS en producción
       sameSite: 'lax'
     }
   }));
@@ -123,6 +119,7 @@ if (!PREVIEW) {
   }));
   console.log("⚠ Usando MemoryStore temporal (solo para preview sin BD)");
 }
+
 
 // ========== FLASH MESSAGES ==========
 app.use(flash());
