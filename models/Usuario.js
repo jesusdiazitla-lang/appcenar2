@@ -50,7 +50,7 @@ const usuarioSchema = new mongoose.Schema({
     type: String,
     trim: true
   },
-  foto: {
+  fotoPerfil: {  // ✅ Para cliente y delivery
     type: String,
     default: null
   },
@@ -66,7 +66,7 @@ const usuarioSchema = new mongoose.Schema({
     type: String,
     trim: true
   },
-  logo: {
+  logoComercio: {  // ✅ CORRECCIÓN: Cambiar de 'logo' a 'logoComercio'
     type: String,
     default: null
   },
@@ -82,18 +82,11 @@ const usuarioSchema = new mongoose.Schema({
   },
 
   // Campos específicos para delivery
-  // En la sección de campos específicos para delivery, REEMPLAZA:
-disponible: {
-  type: Boolean,
-  default: true
-},
-
-// POR:
-estadoDisponibilidad: {
-  type: String,
-  enum: ['disponible', 'ocupado'],
-  default: 'disponible'
-},
+  estadoDisponibilidad: {
+    type: String,
+    enum: ['disponible', 'ocupado'],
+    default: 'disponible'
+  },
 
   // Campos específicos para administrador
   cedula: {

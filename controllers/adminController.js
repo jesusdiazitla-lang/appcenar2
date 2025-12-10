@@ -6,15 +6,31 @@ const bcrypt = require('bcryptjs');
 // Dashboard con estadísticas
 exports.mostrarDashboard = async (req, res) => {
   try {
-    // Obtener fecha actual
+    // ✅ CORRECCIÓN: Obtener fecha actual correctamente
     const hoy = new Date();
     hoy.setHours(0, 0, 0, 0);
+    
+    const manana = new Date(hoy);
+    manana.setDate(manana.getDate() + 1);
+
+    console.log('🔍 Buscando pedidos de hoy:');
+    console.log('   - Desde:', hoy);
+    console.log('   - Hasta:', manana);
 
     // Estadísticas
     const totalPedidos = await Pedido.countDocuments();
+    
+    // ✅ CORRECCIÓN: Usar fechaPedido en lugar de fechaHora
     const pedidosHoy = await Pedido.countDocuments({
-      fechaHora: { $gte: hoy }
+      fechaPedido: { 
+        $gte: hoy,
+        $lt: manana
+      }
     });
+
+    console.log('📊 Resultados:');
+    console.log('   - Total pedidos:', totalPedidos);
+    console.log('   - Pedidos de hoy:', pedidosHoy);
 
     const comerciosActivos = await Usuario.countDocuments({ rol: 'comercio', activo: true });
     const comerciosInactivos = await Usuario.countDocuments({ rol: 'comercio', activo: false });
@@ -42,7 +58,7 @@ exports.mostrarDashboard = async (req, res) => {
       }
     });
   } catch (error) {
-    console.error(error);
+    console.error('❌ Error en mostrarDashboard:', error);
     req.flash('error', 'Error al cargar dashboard');
     res.redirect('/admin/dashboard');
   }
