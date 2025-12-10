@@ -147,16 +147,16 @@
             </p>
             
             <form action="/comercio/pedido/{{pedido._id}}/asignar-delivery" method="POST">
-              <button type="submit" class="btn btn-warning btn-lg w-100 text-dark">
-                <i class="bi bi-person-plus-fill"></i> Asignar Delivery
-              </button>
-            </form>
+        <button type="submit" class="btn btn-warning btn-lg w-100 text-dark">
+          <i class="bi bi-person-plus-fill"></i> Asignar Delivery
+        </button>
+      </form>
 
-            <small class="text-muted d-block mt-3">
-              <i class="bi bi-info-circle"></i> Se asignará automáticamente un delivery disponible
-            </small>
-          </div>
-        </div>
+      <small class="text-muted d-block mt-3">
+        <i class="bi bi-info-circle"></i> Se asignará automáticamente un delivery disponible
+      </small>
+    </div>
+  </div>
       {{else if (eq pedido.estado "en proceso")}}
         <div class="card shadow border-info">
           <div class="card-body text-center">

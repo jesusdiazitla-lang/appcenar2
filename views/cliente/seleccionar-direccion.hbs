@@ -37,22 +37,28 @@
               {{/each}}
 
               <div class="d-grid gap-2 mt-4">
-                <a href="/cliente/direcciones/crear?redirect=back" class="btn btn-outline-success">
+                <a href="/cliente/direcciones/crear" class="btn btn-outline-success">
                   <i class="bi bi-plus-circle"></i> Agregar Nueva Dirección
                 </a>
                 <small class="text-muted text-center">
-                  <i class="bi bi-info-circle"></i> Tu carrito se guardará por 1 hora
+                  <i class="bi bi-info-circle"></i> Tu pedido quedará guardado mientras creas la dirección
                 </small>
               </div>
             </form>
           {{else}}
+            {{!-- 🆕 SECCIÓN MODIFICADA: Sin direcciones --}}
             <div class="alert alert-warning text-center">
               <i class="bi bi-geo-alt fs-1 d-block mb-3"></i>
               <h5>No tienes direcciones registradas</h5>
-              <p>Debes agregar al menos una dirección para realizar tu pedido.</p>
-              <a href="/cliente/direcciones/crear" class="btn btn-success mt-2">
-                <i class="bi bi-plus-circle"></i> Agregar Dirección
-              </a>
+              <p>Debes agregar al menos una dirección para completar tu pedido.</p>
+              <div class="alert alert-info d-inline-block mt-2">
+                <i class="bi bi-cart-check"></i> <strong>Tu pedido quedará guardado</strong> mientras creas la dirección
+              </div>
+              <div class="d-grid mt-3">
+                <a href="/cliente/direcciones/crear" class="btn btn-success btn-lg">
+                  <i class="bi bi-plus-circle"></i> Agregar Dirección Ahora
+                </a>
+              </div>
             </div>
           {{/if}}
         </div>

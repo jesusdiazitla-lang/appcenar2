@@ -20,6 +20,8 @@ router.get('/home', comercioController.mostrarHome);
 
 // Detalle de pedido y asignar delivery
 router.get('/pedido/:pedidoId', comercioController.mostrarDetallePedido);
+
+// ✅ VERIFICAR QUE ESTA RUTA SEA EXACTAMENTE ASÍ:
 router.post('/pedido/:pedidoId/asignar-delivery', comercioController.asignarDelivery);
 
 // Perfil del comercio

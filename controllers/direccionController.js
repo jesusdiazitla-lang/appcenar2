@@ -18,18 +18,22 @@ exports.listar = async (req, res) => {
 
 // Mostrar formulario de crear dirección
 exports.mostrarCrear = (req, res) => {
-  const redirect = req.query.redirect || null;
+  // 🆕 Indicar si viene del flujo de pago
+  const desdeCarrito = !!req.session.carritoTemporal;
   
   res.render('cliente/direcciones/crear', {
     layout: 'layouts/cliente',
-    redirect
+    desdeCarrito
   });
 };
 
-// Crear dirección
+// ==========================================
+// MODIFICAR LA FUNCIÓN: crear
+// ==========================================
+
 exports.crear = async (req, res) => {
   try {
-    const { nombre, descripcion, redirect } = req.body;
+    const { nombre, descripcion } = req.body;
 
     const nuevaDireccion = new Direccion({
       nombre,
@@ -39,13 +43,16 @@ exports.crear = async (req, res) => {
 
     await nuevaDireccion.save();
     req.flash('success', 'Dirección creada exitosamente');
-    
-    // Redirigir según el parámetro redirect
-    if (redirect === 'back') {
-      // Volver a la página anterior (probablemente seleccionar-direccion)
-      return res.redirect('back');
+
+    // 🆕 VERIFICAR SI HAY UN CARRITO PENDIENTE EN SESIÓN
+    if (req.session.carritoTemporal) {
+      console.log('🔄 Carrito temporal encontrado, redirigiendo a selección de dirección');
+      
+      // Redirigir de vuelta al flujo de pago con el carrito restaurado
+      return res.redirect('/cliente/restaurar-carrito');
     }
-    
+
+    // Si no hay carrito, ir a la lista normal de direcciones
     res.redirect('/cliente/direcciones');
   } catch (error) {
     console.error(error);

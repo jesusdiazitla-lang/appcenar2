@@ -1,9 +1,26 @@
 <div class="container py-4">
   <div class="row justify-content-center">
     <div class="col-md-8">
+      
+      {{!-- 🆕 ALERT SI VIENE DESDE EL FLUJO DE PAGO --}}
+      {{#if desdeCarrito}}
+        <div class="alert alert-info mb-3 shadow-sm">
+          <div class="d-flex align-items-center">
+            <i class="bi bi-cart-check fs-3 me-3"></i>
+            <div>
+              <strong>Tu pedido está guardado.</strong><br>
+              <small>Crea una dirección para continuar con el pago.</small>
+            </div>
+          </div>
+        </div>
+      {{/if}}
+
       <div class="card shadow">
         <div class="card-header bg-success text-white">
-          <h4 class="mb-0"><i class="bi bi-plus-circle"></i> Nueva Dirección</h4>
+          <h4 class="mb-0">
+            <i class="bi bi-plus-circle"></i> 
+            {{#if desdeCarrito}}Nueva Dirección de Entrega{{else}}Nueva Dirección{{/if}}
+          </h4>
         </div>
         <div class="card-body p-4">
           <form action="/cliente/direcciones/crear" method="POST">
@@ -18,6 +35,7 @@
                 name="nombre" 
                 placeholder="Ej: Casa, Trabajo, Casa de mamá"
                 required
+                autofocus
               >
               <small class="text-muted">Un nombre para identificar esta dirección</small>
             </div>
@@ -41,11 +59,23 @@
 
             <div class="d-grid gap-2">
               <button type="submit" class="btn btn-success btn-lg">
-                <i class="bi bi-check-circle"></i> Guardar Dirección
+                <i class="bi bi-check-circle"></i> 
+                {{#if desdeCarrito}}
+                  Guardar y Continuar con el Pedido
+                {{else}}
+                  Guardar Dirección
+                {{/if}}
               </button>
-              <a href="/cliente/direcciones" class="btn btn-outline-secondary">
-                <i class="bi bi-x-circle"></i> Cancelar
-              </a>
+              
+              {{#if desdeCarrito}}
+                <a href="/cliente/home" class="btn btn-outline-danger">
+                  <i class="bi bi-x-circle"></i> Cancelar Pedido
+                </a>
+              {{else}}
+                <a href="/cliente/direcciones" class="btn btn-outline-secondary">
+                  <i class="bi bi-x-circle"></i> Cancelar
+                </a>
+              {{/if}}
             </div>
           </form>
         </div>

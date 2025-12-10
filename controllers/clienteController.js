@@ -103,7 +103,11 @@ exports.mostrarCatalogo = async (req, res) => {
   }
 };
 
-// Mostrar selección de dirección para pedido
+// ==========================================
+// ARCHIVO: controllers/clienteController.js
+// MODIFICAR LA FUNCIÓN: seleccionarDireccion
+// ==========================================
+
 exports.seleccionarDireccion = async (req, res) => {
   try {
     const { comercioId, productosIds } = req.body;
@@ -111,7 +115,6 @@ exports.seleccionarDireccion = async (req, res) => {
     console.log('🛒 Debug seleccionarDireccion:');
     console.log('   - comercioId:', comercioId);
     console.log('   - productosIds recibido:', productosIds);
-    console.log('   - Tipo:', typeof productosIds);
 
     // Parsear productosIds si viene como string JSON
     let idsArray;
@@ -131,18 +134,23 @@ exports.seleccionarDireccion = async (req, res) => {
       return res.redirect(`/cliente/catalogo/${comercioId}`);
     }
 
-    console.log('   - IDs parseados:', idsArray);
-
     if (!idsArray || idsArray.length === 0) {
       req.flash('error', 'No se seleccionaron productos');
       return res.redirect(`/cliente/catalogo/${comercioId}`);
     }
 
+    // 🆕 GUARDAR CARRITO EN SESIÓN
+    req.session.carritoTemporal = {
+      comercioId,
+      productosIds: idsArray,
+      timestamp: new Date()
+    };
+
+    console.log('💾 Carrito guardado en sesión:', req.session.carritoTemporal);
+
     const direcciones = await Direccion.find({ cliente: req.session.user.id });
     const comercio = await Usuario.findById(comercioId);
     const productos = await Producto.find({ _id: { $in: idsArray } });
-
-    console.log('   - Productos encontrados:', productos.length);
 
     if (productos.length === 0) {
       req.flash('error', 'No se encontraron los productos seleccionados');
@@ -176,7 +184,44 @@ exports.seleccionarDireccion = async (req, res) => {
   }
 };
 
-// Crear pedido
+// ==========================================
+// AGREGAR NUEVA FUNCIÓN: restaurarCarrito
+// ==========================================
+
+exports.restaurarCarrito = async (req, res) => {
+  try {
+    // Verificar si hay un carrito en sesión
+    if (!req.session.carritoTemporal) {
+      req.flash('warning', 'No hay un pedido pendiente');
+      return res.redirect('/cliente/home');
+    }
+
+    const { comercioId, productosIds } = req.session.carritoTemporal;
+
+    console.log('🔄 Restaurando carrito desde sesión');
+    console.log('   - Comercio:', comercioId);
+    console.log('   - Productos:', productosIds);
+
+    // Redirigir al flujo normal de selección de dirección
+    // Simular el POST original
+    req.body = {
+      comercioId,
+      productosIds: JSON.stringify(productosIds)
+    };
+
+    // Llamar a seleccionarDireccion
+    return exports.seleccionarDireccion(req, res);
+  } catch (error) {
+    console.error('❌ Error al restaurar carrito:', error);
+    req.flash('error', 'Error al restaurar el pedido');
+    res.redirect('/cliente/home');
+  }
+};
+
+// ==========================================
+// MODIFICAR LA FUNCIÓN: crearPedido
+// ==========================================
+
 exports.crearPedido = async (req, res) => {
   try {
     console.log('='.repeat(50));
@@ -185,29 +230,12 @@ exports.crearPedido = async (req, res) => {
     
     const { comercioId, productosIds, direccionId } = req.body;
 
-    console.log('📥 Datos recibidos:');
-    console.log('   - Body completo:', JSON.stringify(req.body, null, 2));
-    console.log('   - comercioId:', comercioId);
-    console.log('   - productosIds:', productosIds);
-    console.log('   - direccionId:', direccionId);
-    console.log('   - Usuario sesión:', req.session.user.id);
+    console.log('📥 Datos recibidos:', { comercioId, productosIds, direccionId });
 
-    // Validar que vengan todos los datos
-    if (!comercioId) {
-      console.error('❌ Falta comercioId');
-      req.flash('error', 'Falta información del comercio');
-      return res.redirect('/cliente/home');
-    }
-
-    if (!productosIds) {
-      console.error('❌ Falta productosIds');
-      req.flash('error', 'No se seleccionaron productos');
-      return res.redirect('/cliente/home');
-    }
-
-    if (!direccionId) {
-      console.error('❌ Falta direccionId');
-      req.flash('error', 'Debe seleccionar una dirección de entrega');
+    // Validaciones
+    if (!comercioId || !productosIds || !direccionId) {
+      console.error('❌ Faltan datos requeridos');
+      req.flash('error', 'Faltan datos para crear el pedido');
       return res.redirect('/cliente/home');
     }
 
@@ -223,42 +251,31 @@ exports.crearPedido = async (req, res) => {
     }
 
     if (!Array.isArray(idsArray) || idsArray.length === 0) {
-      console.error('❌ productosIds no es un array válido:', idsArray);
+      console.error('❌ productosIds no es válido:', idsArray);
       req.flash('error', 'No hay productos válidos');
       return res.redirect('/cliente/home');
     }
 
     // Buscar productos
-    console.log('🔍 Buscando productos con IDs:', idsArray);
     const productos = await Producto.find({ _id: { $in: idsArray } });
-    console.log('✅ Productos encontrados:', productos.length);
-    
     if (productos.length === 0) {
-      console.error('❌ No se encontraron productos');
       req.flash('error', 'No se encontraron los productos');
       return res.redirect('/cliente/home');
     }
 
     // Buscar dirección
-    console.log('🔍 Buscando dirección:', direccionId);
     const direccion = await Direccion.findById(direccionId);
-    
     if (!direccion) {
-      console.error('❌ Dirección no encontrada');
       req.flash('error', 'Dirección no encontrada');
       return res.redirect('/cliente/direcciones');
     }
-    console.log('✅ Dirección encontrada:', direccion.nombre);
 
     // Verificar comercio
-    console.log('🔍 Verificando comercio:', comercioId);
     const comercio = await Usuario.findById(comercioId);
     if (!comercio) {
-      console.error('❌ Comercio no encontrado');
       req.flash('error', 'Comercio no encontrado');
       return res.redirect('/cliente/home');
     }
-    console.log('✅ Comercio encontrado:', comercio.nombreComercio);
 
     // Calcular valores
     const subtotal = productos.reduce((sum, prod) => sum + prod.precio, 0);
@@ -267,12 +284,7 @@ exports.crearPedido = async (req, res) => {
     const valorItbis = (subtotal * itbis) / 100;
     const total = subtotal + valorItbis;
 
-    console.log('💰 Cálculos:');
-    console.log('   - Subtotal:', subtotal);
-    console.log('   - ITBIS ('+itbis+'%):', valorItbis);
-    console.log('   - Total:', total);
-
-    // Preparar productos con snapshot de información
+    // Preparar productos con snapshot
     const productosSnapshot = productos.map(p => ({
       producto: p._id,
       nombre: p.nombre,
@@ -280,9 +292,7 @@ exports.crearPedido = async (req, res) => {
       foto: p.imagen
     }));
 
-    console.log('📸 Snapshot de productos:', productosSnapshot);
-
-    // Crear objeto de pedido
+    // Crear pedido
     const pedidoData = {
       cliente: req.session.user.id,
       comercio: comercioId,
@@ -296,38 +306,22 @@ exports.crearPedido = async (req, res) => {
       fechaPedido: new Date()
     };
 
-    console.log('📋 Objeto de pedido a guardar:');
-    console.log(JSON.stringify(pedidoData, null, 2));
-
-    // Crear y guardar pedido
     const nuevoPedido = new Pedido(pedidoData);
-    
-    console.log('💾 Guardando pedido en la base de datos...');
     const pedidoGuardado = await nuevoPedido.save();
     
-    console.log('='.repeat(50));
-    console.log('✅ PEDIDO CREADO EXITOSAMENTE');
-    console.log('   ID del pedido:', pedidoGuardado._id);
-    console.log('   Estado:', pedidoGuardado.estado);
-    console.log('='.repeat(50));
+    console.log('✅ PEDIDO CREADO:', pedidoGuardado._id);
+
+    // 🆕 LIMPIAR CARRITO TEMPORAL DE LA SESIÓN
+    if (req.session.carritoTemporal) {
+      delete req.session.carritoTemporal;
+      console.log('🧹 Carrito temporal eliminado de la sesión');
+    }
 
     req.flash('success', '¡Pedido realizado exitosamente! ID: ' + pedidoGuardado._id);
     res.redirect('/cliente/pedidos');
     
   } catch (error) {
-    console.error('='.repeat(50));
-    console.error('❌ ERROR AL CREAR PEDIDO');
-    console.error('='.repeat(50));
-    console.error('Mensaje:', error.message);
-    console.error('Stack:', error.stack);
-    console.error('Nombre del error:', error.name);
-    
-    if (error.name === 'ValidationError') {
-      console.error('Errores de validación:', error.errors);
-    }
-    
-    console.error('='.repeat(50));
-    
+    console.error('❌ ERROR AL CREAR PEDIDO:', error);
     req.flash('error', 'Error al crear pedido: ' + error.message);
     res.redirect('/cliente/home');
   }

@@ -25,9 +25,11 @@ router.get('/comercios/:tipoId', clienteController.listarComercios);
 // Catálogo de productos
 router.get('/catalogo/:comercioId', clienteController.mostrarCatalogo);
 
+// 🆕 AGREGAR ESTA RUTA - Restaurar carrito desde sesión
+router.get('/restaurar-carrito', clienteController.restaurarCarrito);
+
 // Seleccionar dirección y crear pedido
 router.post('/seleccionar-direccion', clienteController.seleccionarDireccion);
-// ✅ CORRECCIÓN: Usar clienteController.crearPedido en lugar de pedidoController.crear
 router.post('/crear-pedido', clienteController.crearPedido);
 
 // Perfil del cliente
